@@ -1,0 +1,8 @@
+Sie checken nur die .tex Files ein, keine .aux. bbl etc!!!
+
+Sie können jederzeit gern ein PDF erzeugen. Checken Sie das
+PDF nicht ein! 
+
+Nur die Projektleiter ändern das zentrale Dokument (OHDM.tex).
+
+Nur Projektleiter checken Versionen des Dokumentes als PDF ein.
