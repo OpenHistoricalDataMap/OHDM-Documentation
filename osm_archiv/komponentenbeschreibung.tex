@@ -4,15 +4,9 @@
  \hline
  Zeitraum & PL/Autor(en) & Änderungen \\
  \hline
- Sommersemester 1980 & IHR NAME & 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
- 
-  \\
+ Wintersemester & Schwotzer, Thomas & 
+OSM parsen und Fülle Intermediate DB
+   \\
  \hline
  Wintersemester 1980/81 & IHR NAME & 
 text \newline 
@@ -29,33 +23,137 @@ text \newline
  \end{table}
 
 \section{Aufgabe der Komponente}
-Verbale kurze prägnante Beschreibung, was die Komponente leisten soll.
-Das sind wenige Seiten.
+Eine, wenn nicht die, wesentliche Quelle für OHDM ist Open Street 
+Map (OSM)\footnote{osm.org}.
 
-(Ausfüllen in Prototyp-Phase)
+In einem {\it initialen Upload} wurde OHDM im Sommer 2017 mit
+den Daten des Planet.osm Files vom Januar 2017 gefüllt.
+
+Diese Komponenten realisiert daneben das jährlich Update der
+OHDM Datenbank basierend auf OSM-Planet-Files.
+
+Der Update-Prozess wird im Detail weiter unten beschrieben.
 
 \section{Architektur}
+Die Komponente teilt sich in zwei Subkomponenten:
 
-\subsection{Überlick}
-Grafik der Teile der Komponente (wichtig: Benennung aller Schnittstellen). 
-Anwendung der Komponente nennen (Use Case).
+\begin{description}
+\item[OSM2Intermediate] 
+parsed das OSM File und füllt die
+Intermediate Database.
 
-Übliche Interaktionen durch Interaktionsdiagramme.
+\item[Intermediate2OHDM] füllt oder erneuert die OHDM Datenbank 
+mit Daten aus OSM.
 
-(Ausfüllen in Prototyp-Phase)
+\end{description}
 
-\subsection{Schnittstellendefinitionen}
-Beschreibung der angebotenen Schnittstellen. Benennung der Funktionen
-mit Vor- und Nachbedingungen. Beschreibuung des Protocol-Bindings.
+Diese Komponenten bietet keine Schnittstelle nach außen an.
 
-(Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
+Diese Komponente nutzt keine weiteren Komponenten des Systems.
 
-\subsection{genutztes Komponenten}
-Beschreibung, welche weiteren Komponenten (in welchen Versionen, wo beziehbar) genutzt werden.
+\section{OSM-to-Intermediate}
+Diese Teilkomponenten parsed die OSM Files und füllt die Intermediate Database.
+Die Struktur der Intermediate ist einfach. Sie enthält fünf Tabellen.
 
-(Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
+Die Tabelle {\tt nodes}, {\tt ways} und {\tt relations} werden direkt aus
+den Einträgen im OSM-File gefüllt. Jede Tabelle enthält OSM-Nutzer und -ID.
+Die Nodes enthalten die Koordinaten. Ways und Relations enthalten die IDs
+der Nodes bzw. Ways, die den Way bzw. die Relation beschreiben.
+
+Die IDs werden in diesen Tabelle als String gehalten. Dadurch wird die
+Reihenfolge der IDs gespeichert.
+
+Es gibt zwei weitere Tabelle: {\tt waynodes} repräsentiert die 1-n Beziehung
+zwischen ways und nodes. Die {\tt relationsmember} speichert die 1-n-Beziehung 
+zwischen Relation und ihren Membern (nodes bzw. ways.)
+
+\subsection{SQL\_OSMImporter}
+Der {\tt SQL\_OSMImporter} implementiert {\tt DefaultHandler} und arbeitet wie folgt:
+
+\subsubsection{Begin / Ende Dokument}
+Der Parser erkennt den Beginn und das Ende des XML Dokuments. Diese Events werden jeweils
+einmal am Anfang und am Ende des Parse-Prozesses geworfen. Die Methoden {\tt startDocument()}
+und {\tt endDocument()} werden dabei aufgerufen. Bei Beginn wird eine Statusmeldung erzeugt.
+
+Am Ende werden die {\tt SQLQueues} geschlossen - siehe dazu \ref{SQLStatementQueue}.
+
+\subsubsection{Start / End Element}
+Der Parser ruft die Methode {\tt startElement()} auf, wenn er den Beginn eines XML
+Tags erkennt. Die Methode {\tt endElement()} wird gerufen, wenn das Ende eines
+XML Elements entdeckt wird. XMl-Elemente können geschachtelt sein und sind es im
+OSM-XML-File auch. Einem Aufruf eines {\tt startElement()} können weitere Aufrufe
+der gleichen Methode folgen, weshalb der Zustand relevant ist, in dem der Aufruf erfolgt.
+
+Die beiden Methoden werden durch den Importer implementiert. Es gibt sechs verschiedene
+Tags im OSM File. Die Tags {\tt node, way, relation} enthalten Beschreibungen von Punkten,
+Wegen oder Relationen. Die Tags {\tt tag, nd, member} treten nur innerhalb der Tags
+auf.
+
+Die ersten drei Tags dürfen nur als direkte Kindknoten der XML-Root
+auftauchen. Es wird deshalb geprüft, ob der Parser aktuell {\it außerhalb - OUTSIDE}
+war, d.h. auf der Ebene der Root. Es ist ein Fehler, wenn das nicht der Fall ist.
+Der Fehler wird aber ignoriert, was nicht sauber programmiert ist (!).
+
+Im Erfolgsfall wird für {\tt node, way, relation} die Methode {\tt newElement} aufgerufen.
+Im Fall von {\tt tag, nd, member} wird jeweils {\tt addAttributes, addND, und addMember} aufgerufen.
+
+Das Tag {\tt tag} enthält weitere Informationen zu dem Element - das sind Attribute,
+die später in die Intermediate DB eingetragen werden. Das Tag {\tt nd} gibt es nur innerhalb
+von {\tt way} Tags. Es folgt die ID eines Nodes, das Teil des Weges ist. Das Tag {\tt member}
+gibt es nur innerhalb einer {\tt relation}. Es folgen Beschreibungen (vor allem IDs)
+der Member einer Relation. Das können Nodes und Ways sein.
+
+\subsubsection{newElement}
+Mit jedem Aufruf von {\tt newElement} wird ein {\tt INSERT} Kommando erzeugt.
+Dieses Kommando wird nicht direkt an die Datenbank geschickt, sondern in einer 
+{\tt SQLStatementQueue} gepuffert, siehe \ref{SQLStatementQueue}. Das dient lediglich
+der Performance.
+
+In dieser Implementierung werden parallel mehrere {\tt SQLStatementQueues} gefüllt.
+Die Insert-Queue enthält {\tt INSERT}-Statements, die die Tabellen {\tt node, ways, relations}
+der Intermediate DB füllen. Die Member-Queue sammelt Statements, die in die {\tt waynodes, relationmember}
+gespeichert werden.
+
+Der Code mag anfangs etwas verwirrend sein. Es hilft, zu verfolgen, wie die verschiedenen
+Queues nacheinander gefüllt werden. Es ist auch zu beachten, dass die Statements erst mit
+dem Aufruf von {\tt endElement} geschlossen werden. 
+
+Es gilt auch zu beachten, dass zwischen den Start und dem Ende eines Elements auch
+die anderen drei Methoden {\tt addAttributes, addND, und addMember} aufgerufen werden
+können, die die {\tt INSERT}-Statement im weitere Parameter ergänzen.
+
+\section{Utilities}
+\subsection{SQLStatementQueue}
+\label{SQLStatementQueue}
+Objekte von {\tt SQLStatementQueue} sind ein Puffer zwischen dem Parser/Handler und
+der Datenbank. Objekte der {\tt SQLStatementQueue} werden mit einem Parameterfile erzeugt.
+In dem File stehen die wesentlichen Informationen, um eine JDBC-Connection zu einer Datenbank
+zu erzeugen.
+
+Danach arbeiten sie ähnlich einem {\tt StringBuilder}. Es können schrittweise mit {\tt append}
+String hinzugefügt werden. Die Objekte prüfen nicht, ob eine gültige SQL-Syntax entsteht.
+Die Objekte senden die Statement an die Datenbank, wenn ein definierbarer Schwellwert erreicht
+ist oder wenn explizit die Methode {\tt force} (in Varianten) aufgerufen wird.
+
+Eine Variante sind die FileSQLQueues. Diese erzeugen Files, in denen die Statements gespeichert
+werden. Die Managed-Queues sorgen außerdem dafür, dass diese Files nach einem gewissen Füllstand
+geschlossen werden und mittels psql ausgeführt werden. 
+
+Die Implementierung dieser Klassen ist sehr stabil. {\bf Der Nutzung hat sich bewährt und ist in
+dieser Komponente Pflicht!}
+
+\section{Intermediate-to-OHDM}
+Der Quellcode dieser Teilkomponenten liegt im package {\tt osm2inter}.
+
+Das Package enthält nur wenige Klassen. {\tt OSMImport} enthält die {\tt main()}
+Funktion. Dort wird ein {\tt SAXParser} erzeugt. Der Parser benötigt ein
+Objekt, das die Klasse {\tt DefaultHandler} implementiert.
+
+Der Parser parsed darauf das OSM-File. Sobald ein neues XML-Element gefunden wurde,
+wird eine entsprechende Methode auf dem DefaultHandler aufgerufen. 
 
 \section{Nutzung}
+Der Code befindet sich im Repository {\tt OSMUpdateInsert}\footnote{https://github.com/OpenHistoricalDataMap/OSMImportUpdate}
 \subsection{Code}
 Wo findet man den Code. Struktur des Codes. (In Prototyphase ausfüllen,
 kann dort sehr kurz sein. Ab Alpha-Phase konkret beschreiben.)
