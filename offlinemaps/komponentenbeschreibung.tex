@@ -1,0 +1,161 @@
+\section{Dokumentengeschichte}
+\begin{table}[h]
+ \begin{tabular}{|l|l|p{4cm}|}
+ \hline
+ Zeitraum & PL/Autor(en) & Änderungen \\
+ \hline
+ Sommersemester 2017 & Schulz, Daniel & 
+Kapitel erstellt und Software dokumentiert \newline  
+  \\
+ \hline
+ \end{tabular}
+ \caption{Dokumentengeschichte}
+ \end{table}
+
+\section{Aufgabe der Komponente}
+
+Bei den OHDM OfflineMaps (oder auch der OHDMApp) mit Xamarin handelt es sich um eine mobile Anwendung, welche vorab einen Datenexport aus OHDM erhält und danach in der Lage ist auf dem mobilen Gerät offline die entsprechenden Karten zu einem selbst bestimmbaren Zeitpunkt zu rendern.
+So kann in der App beispielsweise der 01.02.1790 ausgewählt werden und es würden die zu diesem Datum gültigen Kartendaten dargestellt werden.
+Da die Anwendung auf Xamarin und C\# basiert kann sie jederzeit mit geringem Aufwand auch auf iOS portiert und ausgerollt werden. (Bisher wird nur Android unterstützt)
+
+\section{Architektur}
+
+\subsection{Überlick}\label{ch:offlineoverview}
+
+\hspace*{-3em}
+\includegraphics*[width=1.3\linewidth,natwidth=1137,natheight=1042]{offlinemaps/bilder/komponentendiagramm.png}
+
+In der obenstehenden durch Visual Studio automatisiert generierten CodeMap lassen sich die einzelnen Bestandteile der Xamarin-Anwendung ablesen, sowie die extern eingebundenen Bibliotheken/NuGet-Pakete.\\
+\newpage
+Nachfolgend werden alle Bestandteile sehr kurz erläutert:\\
+\\
+\begin{itemize}
+	\item MainActivity: Diese Klasse ist für das UserInterface unter Android zuständig und definiert jegliche Interaktion mit dem Benutzer.
+	\item MapDrawer: Diese Klasse definiert die grundlegende Darstellung von Kartenelementen, also zum Beispiel in welchen Zoomstufen sie gerendert werden und welche Styles sie nutzen.
+	\item CsvUtils: Diese Klasse beinhaltet die Implementierung der Übertragung der Kartendaten aus einer CSV, welche zuvor aus der OHDM-Datenbank erzeugt wurde in eine neue interne SQLite-Datenbank für die Anwendung.
+	\item MapEventHandler, MapEventArgs, CsvEventHandler, CsvEventArgs: Diese Klassen definieren Events, welche bei den verschiedenen Datenverarbeitungsschritten der App genutzt werden um dem Anwender den Fortschritt zu signalisieren.
+	\item Styles: In dieser Klasse werden die Styles definiert, welche der MapDrawer später anwendet. Dies sind zum Beispiel die Farbe und Stärke von Linien, Punkten oder Polygonen.
+	\item DatabaseHelper: Der DatabaseHelper definiert die Schnittstellen und Funktionen zur Anbindung an die lokale SQLite-Datenbank, welche zur Datenhaltung der eingelesenen Kartendaten genutzt wird.
+	\item PostgisObjectMap: Diese Klasse wird genutzt um die Felder der PostgisObjects auf die Spalten der Daten-CSV zu mappen.
+	\item PostgisObject, PostgisPoint, PostgisPolygon, PostgisLine: Diese Klassen stellen die objektbasierte Darstellung der Daten aus der OHDM-Datenbank dar, welche vom Programm genutzt wird.
+	\item GlobalData: Diese Klasse ist nur eine statische Klasse zur Zwischenspeicherung von Daten auf welche von mehreren Klassen zugegriffen werden muss von denen nicht alle den nötigen Kontext aufweisen.
+\end{itemize}
+\newpage
+Nachfolgend werden alle externen Libraries erläutert, welche nicht automatisiert von Xamarin geladen oder benötigt werden, sondern spezifisch für die Anwendung erforderlich sind:\\
+\\
+\begin{itemize}
+	\item CartoMobileSDK: Hierbei handelt es sich um das Karten-Framework Carto, welches zur Darstellung der Offline-Karten genutzt wird.\\ \url{https://carto.com/docs/carto-engine/mobile-sdk/}
+	\item CsvHelper: Bei CsvHelper handelt es sich um ein .NET basiertes Framework zum automatisierten einlesen und mappen von Objekten aus einer CSV-Datei.\\
+	\url{https://github.com/JoshClose/CsvHelper}
+	\item Newtonsoft.JSON: Hierbei handelt es sich um ein Framework zur Serialisierung und Deserialisierung von Objekten in JSON-Objekte.\\
+	\url{https://www.newtonsoft.com/json}
+	\item SQLite-net: Hierbei handelt es sich um eine Multiplattform-Bibliothek, welche die Erzeugung und Anbindung von SQLite-Datenbanken ermöglicht.\\
+	\url{https://github.com/praeclarum/sqlite-net}
+\end{itemize}
+
+\subsection{Schnittstellendefinitionen}\label{ch:offlineinterfaces}
+Die einzige Quasi-Schnittstelle, welche von den OfflineMaps genutzt bzw. benötigt wird ist ein Datenexport mit OHDM-Daten aus einer OHDM-Datenbank.
+Zum Einlesen wird ein CSV-File in der folgenden Struktur benötigt:\\
+\begin{lstlisting}[
+basicstyle=\footnotesize
+]
+id;name;type_target;classification_id;classname;subclassname;valid_since;
+valid_until;point;line;polygon
+19;"S Tiergarten";1;396;"public_transport";"stop_position";"2015-12-22";
+"2017-07-10";"{""type"":""Point"",""coordinates"":[13.3364598,52.5142085]}";"";""
+20;"S Tiergarten";1;542;"railway";"station";"2015-12-22";
+"2017-07-10";"{""type"":""Point"",""coordinates"":[13.3364598,52.5142085]}";"";""
+65;"Jakob-Kaiser-Platz";1;589;"highway";"motorway_junction";"2017-01-01";
+"2017-07-10";"{""type"":""Point"",""coordinates"":[13.2906741,52.533132]}";"";""
+112;"S Pichelsberg";1;542;"railway";"station";"2016-03-04";
+"2017-07-10";"{""type"":""Point"",""coordinates"":[13.2275633,52.5102387]}";"";""
+136;"S Schoeneberg";1;583;"highway";"bus_stop";"2016-03-11";
+"2017-07-10";"{""type"":""Point"",""coordinates"":[13.3529104,52.4797246]}";"";""
+\end{lstlisting}
+\newpage
+Aus der Berliner-OHDM-Datenbank, welche auf dem PostgreSQL-Server der HTW Berlin liegt können die Daten in diesem Format mit der folgenden Abfrage extrahiert werden:
+
+\begin{lstlisting}[
+basicstyle=\footnotesize
+]
+SELECT gog.id, go.name, gog.type_target, gog.classification_id, 
+c.class as classname, c.subclassname, gog.valid_since, gog.valid_until, 
+ST_AsGeoJSON(p.point) as point, ST_AsGeoJSON(l.line) as line, 
+ST_AsGeoJSON(poly.polygon) as polygon
+
+FROM berlin.geoobject as go, berlin.classification as c, berlin.geoobject_geometry as gog
+
+LEFT OUTER JOIN berlin.points as p ON gog.type_target=1 AND gog.id_target=p.id
+
+LEFT OUTER JOIN berlin.lines as l ON gog.type_target=2 AND gog.id_target=l.id
+
+LEFT OUTER JOIN berlin.polygons as poly ON gog.type_target=3 AND gog.id_target=poly.id
+
+WHERE go.id=gog.id_geoobject_source AND gog.classification_id=c.id AND 
+gog.type_target>0 AND gog.type_target<4 AND 
+(point IS NOT NULL OR line IS NOT NULL OR polygon IS NOT NULL);
+\end{lstlisting}
+
+Alternativ könnten die Daten auch aus den Rendering-Tabellen bezogen werden, hierzu müsste nur eine neue Abfrage entwickelt werden und das Programm von WGS84, welches bisher genutzt wird, auf Pseudo-Mercator umgestellt werden.
+
+\subsection{Genutzte Komponenten}
+
+In der Anwendung wurden die folgenden Komponenten, welche zuvor in Kapitel \ref{ch:offlineoverview} detaillierter beschrieben wurden in den angegebenen Versionen benutzt:\\
+\\
+\begin{itemize}
+	\item CartoMobileSDK: Version 4.1.0
+	\item CsvHelper: Version 2.16.3.0\\(Achtung! Diese Version ist wichtig, da in der nachfolgenden Version die Nutzung komplett umgestellt wurde und ein komplettes Rewrite des CSV-Codes erfordern würde.)
+	\item Newtonsoft.JSON: Version 10.0.3
+	\item SQLite-net bzw. sqlite-net-pcl: Version 1.4.118 
+\end{itemize}
+Alle Versionen können ganz normal über den in Visual Studio integrierten NuGet-Paketmanager installiert werden.
+\newpage
+\section{Nutzung}
+\subsection{Code}
+Der aktuelle Code kann unter\\ \url{https://github.com/OpenHistoricalDataMap/OfflineMaps}\\ bezogen werden. Die Struktur des Codes wurde bereits in Kapitel \ref{ch:offlineoverview} erläutert und grafisch dargestellt.
+
+\subsection{Deployment / Runtime}
+Als Vorbedingung für das Deployment müssen zuerst folgende Dinge auf dem PC, welcher eingesetzt werden soll vorliegen bzw. installiert sein:\\
+\\\\
+Android ADB-Treiber von dem Mobilgerät, auf welchem später die Anwendung deployed werden soll.\\
+Der Standard-Google-Treiber kann hier bezogen werden:\\ \url{https://developer.android.com/studio/run/win-usb.html}\\
+Alternativ sind noch diese möglich: \url{https://adb.clockworkmod.com}\\
+Hierbei ist zu beachten, dass jeder Gerätehersteller zum Teil eigene Treiber benötigt, vor allem Samsung, diese sind separat im Internet zu beziehen.\\\\
+Zusätzlich muss das USB-Debugging auf Android aktiviert werden, wie hier beschrieben:\\
+\url{https://www.howtogeek.com/129728/how-to-access-the-developer-options-menu-and-enable-usb-debugging-on-android-4.2/}\\\\\\
+Es muss ein Datenextrakt aus der OHDM-Datenbank in Form einer CSV-Datei vorliegen. In Kapitel \ref{ch:offlineinterfaces} wird erläutert, wie und in welchem Format dieser zu erzeugen ist.\\ Die Datei muss hinterher den Namen ``outputnew.csv'' erhalten.\\\\\\
+Um das OfflineMaps-Projekt zu bearbeiten oder zu deployen ist als Entwicklungsumgebung Visual Studio 2017 mit Xamarin nötig.\\
+Visual Studio 2017 kann theoretisch in der kostenlosen Community-Edition heruntergeladen und installiert werden, da aber für Hochschulangehöroge die Enterprise-Version über Microsoft Imagine/Dreamspark kostenlos bezogen werden kann, sollte diese genutzt werden und in der nachfolgenden Erläuterung wird auch nur auf diese eingegangen.\\
+Informationen zum Download von Microsoft-Produkten für Hochschulangehörige der HTW Berlin finden sich hier:\\
+\url{http://www.f4.htw-berlin.de/studieren/softwarelizenzen/}\\
+Im nachfolgenden Link wird erläutert mit welchen Optionen Visual Studio 2017 installiert werden muss um Xamarin-Projekte zu unterstützen:\\
+\url{https://developer.xamarin.com/guides/cross-platform/getting_started/installation/windows/}\\
+Die Xamarin-Installation entsprechend dem Guide ist zwingend erforderlich!
+Zusätzlich müssen im Installationsbildschirm von Visual Studio 2017, in welchem auch die Xamarin-Pakete angehakt werden auch zwingend alle Git und GitHub-Pakete, sowie Pakete, welche das Android SDK betreffen angehakt werden, hierzu sollten alle Unterpunkte durchgeklickt und durchsucht werden.\\\\
+Nachdem Visual Studio 2017 mit allen zuvor beschriebenen Komponenten installiert wurde, kann es gestartet werden.\\
+Anschließend kann man dem Tutorial von Microsoft zum Klonen eines Git-Repos ab dem Punkt ``Clone from another Git Provider'' folgen (die Punkte darüber können ignoriert werden):\\
+\url{https://docs.microsoft.com/en-us/vsts/git/tutorial/clone?tabs=visual-studio#clone-from-another-git-provider}\\
+Der Git-Link des Repos der OfflineMaps, welcher zum klonen eingesetzt wird lautet: 
+\url{https://github.com/OpenHistoricalDataMap/OfflineMaps.git}\\
+Gegebenfalls fragt VisualStudio vor dem Klonen noch die eigenen GitHub-Zugangsdaten ab.\\\\
+Nachdem die Solution entsprechend der Angaben des Microsoft-Tutorials geklont und geöffnet wurde ist das Projekt nahezu bereit zum Deployment und es müssen nur noch zwei individuelle Schritte ausgeführt werden:\\\\
+Zuerst muss in der AndroidManifest.xml, welche sich unter Properties befindet ein eigener Name für das Package gesetzt werden, da es sonst später zu Fehlern mit dem API-Key kommt.\\
+In der Klasse MainActivity muss die Stringkonstante LICENSE in welcher nur exemplarisch ``XXX'' steht gegen einen eigenen API-Key von Carto ausgetauscht werden. Dieser kann von Carto kostenlos erzeugt werden gemäß der nachfolgenden Anleitung unter dem Punkt ``Registering your App'':\\
+\url{https://carto.com/docs/carto-engine/mobile-sdk/getting-started/#registering-your-app}\\\\
+Als letzten Schritt muss nur noch die im Projektverzeichnis unter Assets liegende ``outputnew.csv'' durch die ausgetauscht werden, welche gemäß Kapitel \ref{ch:offlineinterfaces} erzeugt wurde.\\\\
+Danach kann die App durch einen Klick auf den grünen Pfeil im oberen Zentrum der Navigationsleisten oder einen Druck auf F5 auf dem (an den PC angeschlossenen) Android-Gerät deployed und ausgeführt werden.\\
+Sollte es Fehlermeldungen wegen nicht korrekt geladener NuGet-Pakete geben, so können diese in der NuGet-Konsole (Extras -> NuGet-Paket-Manager -> Paket-Manager-Konsole) mit dem Befehl ``update-package -reinstall'' neu initialisiert werden.\\\\
+Zusätzlicher Hinweis: Durch einen Bug im aktuellen Android-SDK verhält sich Android Oreo noch etwas seltsam, so schließt sich beim Ausführen über Visual Studio die Anwendung direkt wieder. Hier muss die Anwendung nachdem sie über Visual Studio installiert wurde einfach vom Handy aus gestartet werden, dann funktioniert alles. Für das Debugging sollte aus diesem Grund aktuell Android in der Version  $\leq7.1.2$ verwendet werden. Außerdem ist dringend anzuraten, alle Visual Studio und Android SDK Updates zu installieren.
+
+
+\section{Qualitätssicherung}
+
+Die Qualitätssicherung der Darstellung erfolgt bisher durch akribische Abgleiche der OHDM-Darstellung mit der aktuellen deutschen OSM-Darstellung und die Angleichung an dieselbe. Für das Handling der Anwendung was Verständlichkeit und Performance angeht wurde die Qualität durch externe unbeteiligte Personen bewertet und dann verbessert.\\
+\\
+Issue-Tracking: Bisher keines.
+
+\subsection{Test}
+Die Komponente kann momentan ausschließlich durch Anwender-Testgruppen getestet werden und nicht automatisiert, aufgrund der Komplexität der Darstellung. Es wäre allenfalls möglich die Datenimport und -Exportfunktionen um Unit-Tests zu erweitern, was aber aktuell noch nicht umgesetzt ist. 
+
+\section{Vorschläge / Ausblick}
+In der Anwendung sind bisher nur exemplarisch die wichtigsten Typen an OSM-Objekten mit spezifischen Rendering-Merkmalen für eine spezifische Darstellung versehen. Hier bietet es sich an auch die übrigen zu implementieren. Außerdem wäre es sinnvoll und gewinnbringend die vorhandene Xamarin-Codebasis zu erweitern und um die entsprechenden iOS und UWP-Schnittstellen zu erweitern um die Anwendung auch auf iOS- und Windows-Geräten zum Einsatz bringen zu können.

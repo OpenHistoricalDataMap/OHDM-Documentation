@@ -1,6 +1,8 @@
 \documentclass[german]{book}
-\usepackage{url}
+%\usepackage{url}
+\PassOptionsToPackage{hyphens}{url}\usepackage[breaklinks=true]{hyperref}
 \usepackage{dsfont}
+\usepackage{listings}
 \usepackage{german}
 \usepackage[utf8]{inputenc}
 \usepackage[final]{graphicx}
@@ -15,6 +17,7 @@ Version 0.0.0
 \author{
 Thomas Schwotzer \\
 Mohamadbehzad Karimi Ahmadabadi\\
+Daniel Schulz\\
 nächste/r Projektleiter/in\\
 (Herausgeber)
 }
@@ -58,5 +61,8 @@ nächste/r Projektleiter/in\\
 
 \chapter{CIDOC CRM Unterstützung}
 \input{cidoc_crm/komponentenbeschreibung.tex}
+
+\chapter{OHDM OfflineMaps mit Xamarin}
+\input{offlinemaps/komponentenbeschreibung.tex}
 
 \end{document}
