@@ -29,12 +29,15 @@ text \newline
  \end{table}
 
 \section{Aufgabe der Komponente}
-\begin{figure}[h!]
-\centering
-\includegraphics[width=127mm]{ohdm_datenmodell/ohdm_data_modell.png}
-\caption{OHDM Datamodell}
-\label{fig:datamodell}
-\end{figure}
+%\begin{figure}[h!]
+%\centering
+%\includegraphics[width=127mm]{ohdm_datenmodell/ohdm_data_modell.png}
+%\caption{OHDM Datamodell}
+
+%\label{fig:datamodell}
+%\end{figure}
+
+
 Im Datenmodell von OHDM geht alles vom Geoobjekt (geoobject) aus. Dieses zentrale Object beschreibt alle Modelle auf der Karte, da alle Informationen der Modelle auf das geobject verweisen. Das einzige Objekt worauf das geobject verweist, ist der Ersteller (external\_users). Der Ersteller des Objekts greift durch ein externes System (external\_systems) auf dern Server zu und gibt die Informationen über das Geobjekt weiter. Wie nun ein Geobjekt im Allgemeinen aussieht wird im nächsten Abschnitt beschrieben.
 
 \subsection{Geometrien in GIS}
