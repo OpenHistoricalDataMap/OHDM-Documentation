@@ -4,21 +4,12 @@
  \hline
  Zeitraum & PL/Autor(en) & Änderungen \\
  \hline
- Sommersemester 1980 & IHR NAME & 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
+ Wintersemester 2017/18 & Thomas Schwotzer & 
+ Initialer Text
  
   \\
  \hline
  Wintersemester 1980/81 & IHR NAME & 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
 text \newline 
 text \newline 
  
@@ -31,5 +22,97 @@ text \newline
  \end{table}
 
 \section{Ziel des Systems}
-\section{Laufenden Arbeiten}
-\section{Pläne}
+Open Historical Data Map (OHDM) versteht sich als offene und freie Plattform zur Speicherung, 
+Abfrage und Visualisierung orts- und zeitgebundener Daten.
+
+Primär sind damit {\bf Karten} gemeint. OHDM erlaubt die Speicherung von Vektorgeometrien
+und generiert basierend darauf Karten, die über einen Web-Map-Service (WMS) angeboten werden,
+siehe Kapitel \ref{wms_wfs}.
+
+Das zentrales Konzept aber von OHDM ist das {\bf historische Geoobjekt}. Ein Geoobjekt
+ist ein menschliches Artefakt, das zu einem oder mehrere Zeitpunkten einem Raum auf der
+Erdoberfläche zugeordnet werden kann. 
+
+Zum Management der Geometrien und der Geoobjekte entstehen eigene Editoren für OHDM.
+
+Geoobjekten lassen sich weitere Daten zuordnen, vor allem Bilder, aber auch Sensordaten. 
+
+OHDM Nutzer sollen historische Daten in das System laden können und diese dann per WMS 
+anschauen können. OHDM wird eine Linked Data Schnittstelle anbieten und wir arbeiten an einem
+SPARQL Endpoint.
+
+\subsection{Historische Karten}
+OHDM-Geoobjekte sind damit alle Gebäude, Straßen etc. die von Menschen geschaffen wurde.
+Aber auch Verwaltungsgrenzen jeder Art sind Geoobjekte, ebenso wie Ereignisse, die sich 
+Orten zuordnen lassen (Schlachten, Versammlungen, Revolutionen etc. pp.)
+
+In jedem Fall können damit Geoobjekten Geometrie zugewiesen werden. Diese Zuordnung ist
+in jedem Fall abhängig von der Zeit. Möge unsere Hochschule, die HTW Berlin, als Beispiel
+dienen. Im Jahr 2017 hat die HTW mehrere Standorte in Berlin und auf jedem Standort existieren
+mehrere Gebäude und Wege. Man kann daher ein Zuordnung. Es gibt eine Reihe von Geometrien,
+die die Gebäude und Wege beschreiben. Man kann diese nun dem Objekt HTW zuweisen. Diese 
+Zuweisung gilt aber für das Jahr 2017.
+
+Vor einige Jahren entstand ein zusätzlicher Campus in Oberschöneweide, dafür wurden andere
+Standorte abgegeben. Die Grundrisse der Gebäude haben sich nicht geändert. Die Zuordnung
+der Geometrien zu den Geoobjekten haben sich aber geändert. 
+
+Manche Geoobjekte änderten aber auch im Laufe der Zeit ihre Position 
+(wie die Siegessäule in Berlin oder der Obelisk auf dem Place de la Concorde in Paris).
+Viele Gebäude beherbergen über Jahre hinweg ganz unterschiedliche Objekte. Das aktuelle
+Finanzministerium der Bundesregierung ist im Jahre 2017 im gleichen Gebäude in dem zuvor die
+Treuhandanstalt war.
+
+Anhand dieser Daten lassen sich historische Karten erzeugen. OHDM bietet eine WMS und WFS
+Schnittstelle an, über die historische Karten angezeigt werden können, siehe auch http://ohdm.net
+
+\subsection{Historische Daten}
+OHDM erlaubt die Speicherung von Daten mit einem zeitlichen und örtlichen Bezug.
+Aktuell arbeiten wir an der Integration von Sensordaten und von Daten, die einem Geoobjekt
+zugeordnet werden können.
+
+\subsubsection{Sensordaten}
+Einige Arbeiten beschäftigen sich derzeit an Daten wie Temperatur, Feinstaubkonzentration, Luftfeuchtigkeit 
+und Luftdruck. Sensordaten sind zeitliche und örtliche Größen. Messungen sind in der Regel 
+punktuelle Messungen. Derzeit wird an Schnittstellen für den Import von Sensordaten in OHDM gearbeitet.
+Die Visualisierung der Daten wird auch hier mittels WMS angeboten werden.
+
+\subsubsection{Daten für historische Objekte}
+Aktuell wird bei Geoobjekten vor allem an menschliche Infrastruktur gedacht (Häuser, Straßen etc.).
+Administrative Objekte (Länder, Verwaltungsbezirke etc.) kommen hinzu.
+
+Wir viele solcher Objekte lassen sich historische Dokumente (Bilder, Verweise auf Webseiten) finden.
+Das können Bilder sein, aber auch Urkunden. Es können aber vor allem auch alte Karten sein.
+
+Alte Karten sind in OHDM dann nutzbar, wenn sie gescannt vorliegen. Diese Rasterdaten können
+Geoobjekten zugewiesen werden. Alte Karten können aber auch Basis für die Editoren sein, siehe 
+Abschnitt \ref{editoren}.
+
+Derzeit wird an einer Schnittstelle gearbeitet, die den Import solcher historischer Daten 
+in OHDM erlaubt. Die Visualisierung wird als weiterer WMS-Layer in OHDM erfolgen.
+
+\subsection{Importschnittstellen}
+Derzeit wird an folgenden Importschnittstellen gearbeitet:
+
+\begin{itemize}
+\item
+Import von GeoJSON
+\item
+Import von RDF-Files
+
+\end{itemize}
+
+\subsection{Anfrageschnittstellen}
+Derzeit wird an folgenden Anfrageschnittstellen gearbeitet:
+
+\begin{itemize}
+\item
+Linked Open Data Schnittstelle: Geoobjekte werden über URI referenzierbar.
+\item
+SPARQL-Endpoint
+\item
+GeoSPARQL-Endpoint
+\item
+Integration von CIDOC-CRM
+\end{itemize}
+
