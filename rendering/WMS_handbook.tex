@@ -1,0 +1,189 @@
+\section{\"Ubersicht WMS}
+\begin{tabular}{ll}
+\emph{Operation} & \emph{Beschreibung} \\
+\hline 
+GetMap & Liefert Karte(Bild) der gew\"ahlten Gegend \\ 
+\hline 
+Getcapabilities & Liefert Metadaten, Operationen und m\"ogliche Layer \\ 
+\hline 
+Exceptions & Liefert (wenn geworfen) Exceptions zur\"uck \\ 
+\hline 
+GetFeatureInfo(opt) & Liefert Geometrie + Attribute einer Position(px) \\ 
+\hline 
+DescribeLayer & Triggert \emph{WFS\footnote{Web Feature Service}} und liefert spezifischere Daten \\ 
+\hline 
+GetLegendGraphic & Liefert legend f\"ur die Karte \\ 
+\hline 
+\end{tabular} 
+\section{GetMap}\begin{tabular}{lcl}
+\textbf{Parameter} & \textbf{notwendig} & \textbf{Beschreibung}\\
+\hline 
+service & Ja & Service(WMS) \\ 
+\hline 
+version & Ja & Versionsnummer(1.1.0) \\ 
+\hline 
+request & Ja & GetMap \\ 
+\hline 
+layers & Ja & Anzuzeigende Ebenen \\ 
+\hline 
+styles & Ja & Wenn leer, wird der Standardstyle benutzt \\ 
+\hline 
+srs / crs & Ja & Projektionsformat(ESPG:3857) \\ 
+\hline 
+bbox & Ja & BoundingBox der Karte \\ 
+\hline 
+width & Ja & Breite der Karte in Pixel \\ 
+\hline 
+height & Ja & H\"ohe der Karte in Pixel \\ 
+\hline 
+format & Ja & Kartenformat(siehe Kartenformate)\\
+\hline 
+transparent & x & Transparenz der Karte(true|\emph{false}) \\ 
+\hline 
+bgcolor & x & Hintergrundfarbe der Karte(RRGGBB) \\ 
+\hline 
+exceptions & x & Exceptionformat(siehe Exceptionformate) \\ 
+\hline 
+time & x & Zeit(siehe Zeitformate) \\ 
+\hline 
+\end{tabular} \\
+
+\textbf{Syntax}\\
+/geoserver/wms?service=wms\\
+request=GetMap\\
+\&service=WMS\\
+\&version=1.1.1\\
+\&layers=ohdm\_t:boundary\_lines\\
+\&styles=population\\
+\&srs=EPSG:3857\\
+\&bbox=-14.1,21.7,-57.15,58.96\\
+\&width=900\\
+\&height=500\\
+\&time=yyyy-MMddThh:mm:ss.SSSZ\\
+\&format=image/png\\
+\hrule
+\newpage
+\section{GetCapabilities}
+\begin{tabular}{lcl}
+\textbf{Parameter} & \textbf{notwendig} & \textbf{Beschreibung}\\
+\hline 
+service & Ja & Service(WMS) \\ 
+\hline 
+version & Ja & Versionsnummer(1.1.0) \\ 
+\hline 
+request & Ja & GetFeatureInfo \\ 
+\hline 
+namespace & x &  limitiert die Suche auf den geg. Namespace\\
+\hline
+format & x & Format der Response\\
+\hline
+\end{tabular}\\
+
+\textbf{Syntax}\\
+/geoserver/wms?service=wms\\
+\&version=1.1.0\\
+\&request=GetCapabilities\\
+\hrule
+\paragraph{Requests}
+des Typ \emph{GetCapabilities} kann mit Hilfe von \emph{Vendorparametern} spezifiziert werden. Die hier gelisteten Parameter sind an keine Standards und sind nur auf \emph{GeoServer} Systemen nutzbar.\\\\
+\begin{tabular}{lcl}
+\textbf{Vendor-Paramter} & \textbf{Beschreibung} \\
+\hline 
+angle  & Dreht Karte im Uhrzeigersinn um x Grad\\ 
+\hline 
+buffer  & Zeichnet Features, die X-Pixel ausserhalb liegen mit  \\ 
+\hline 
+cql\_filter &  Liste aus CQL-Filtern \\
+\hline
+filter & Liste aus OGC-Filtern \\
+\hline
+
+\end{tabular} 
+\paragraph{Filtersyntax\\}
+\textless Filter\textgreater\\
+    \textless PropertyIsLessThan\textgreater\\
+        \textless PropertyName\textgreater\\
+            valid\_since\\
+        \textless/PropertyName\textgreater\\
+        \textless\ Literal\textgreater 2010-03-19Z \textless/Literal\textgreater\\
+    \textless/PropertyIsLessThan\textgreater\\
+\textless/Filter\textgreater\\
+
+\paragraph{CQL-Syntax\\}
+INTERSECTS(geometry, POINT (14.71 56.52))
+
+
+
+\section{Exceptions}
+\begin{tabular}{ll} 
+Format & Syntax \\ 
+\hline 
+XML & exceptions=application/vnd.ogc.se\_xml\\ 
+\hline 
+INIMAGE & exceptions=application/vnd.ogc.se\_inimage \\ 
+\hline 
+BLANK & exceptions=application/vnd.ogc.se\_blank \\ 
+\hline 
+PARTIALMAP & exceptions=application/vnd.gs.wms\_partial \\ 
+\hline 
+JSON & exceptions=application/json \\ 
+\hline 
+JSONP & exceptions=text/javascript \\ 
+\hline 
+\end{tabular} 
+\section{GetFeatureInfo}
+\begin{tabular}{lcl}
+\textbf{Parameter} & \textbf{notwendig} & \textbf{Beschreibung}\\
+\hline 
+service & Ja & Service(WMS) \\ 
+\hline 
+version & Ja & Versionsnummer(1.1.0) \\ 
+\hline 
+request & Ja & GetFeatureInfo \\ 
+\hline 
+layers & Ja & Anzuzeigende Ebenen \\ 
+\hline 
+styles & Ja & Wenn leer, wird der Standardstyle benutzt \\ 
+\hline 
+srs / crs & Ja & Projektionsformat(ESPG:3857) \\ 
+\hline 
+bbox & Ja & BoundingBox der Karte \\ 
+\hline 
+width & Ja & Breite der Karte in Pixel \\ 
+\hline 
+height & Ja & H\"ohe der Karte in Pixel \\ 
+\hline 
+query\_layers & Ja & Liste von zu durchsuchenden Layern(getrennt mit ,)\\
+\hline 
+info\_format & x & Transparenz der Karte(true|\emph{false}) \\ 
+\hline 
+feature\_count & x & Hintergrundfarbe der Karte(RRGGBB) \\ 
+\hline 
+x & x & X-Koordinate des zu untersuchenden Punktes \\ 
+\hline 
+y & x & Y-Koordinate des zu untersuchenden Punktes \\ 
+\hline 
+\end{tabular} 
+
+\section{DescribeLayer}
+\begin{tabular}{lcl} 
+\textbf{Parameter} & \textbf{notwendig} & \textbf{Beschreibung} \\ 
+\hline 
+service & Ja & WMS \\ 
+\hline 
+version & Ja & 1.0.0 \\ 
+\hline 
+request & Ja & DescribeLayer \\ 
+\hline 
+Layers & Ja & Liste zu beschreibender Layer \\ 
+\hline 
+exceptions & x & Exceptionformat \\ 
+\hline 
+output\_format & x & Output Format \\ 
+\hline 
+\end{tabular} 
+\paragraph*{Output-Formate\\}
+Text : text/xml\\
+GML2 :application/vnd.ogc.wms\_xml\\
+JSON :application/json\\
+JSONP :text/javascript\\
