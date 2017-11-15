@@ -230,5 +230,7 @@ TSWLatexianTemp*
 
 # additional files
 *.mdj
+Test.pdf
+Test.tex
 
 # End of https://www.gitignore.io/api/latex
