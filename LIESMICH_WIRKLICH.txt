@@ -6,3 +6,5 @@ PDF nicht ein!
 Nur die Projektleiter ‰ndern das zentrale Dokument (OHDM.tex).
 
 Nur Projektleiter checken Versionen des Dokumentes als PDF ein.
+
+Es gibt eine .gitignore File. Dort liste ich alle Dateien auf die nicht comitten werden sollten. Sollte aus einem Grund doch eine von diese Dateien hochgeladen werden, schreibt mir einfach im Slack. Keine Mail bitte. Falls ihr selber unnützige Dateien habt und meint die sollten in die Liste, ganz unten in der .gitignore Datei einfügen bitte.
