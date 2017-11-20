@@ -1,4 +1,53 @@
-\section{\"Ubersicht WMS}
+\section{Dokumentengeschichte}
+\begin{table}[h]
+ \begin{tabular}{|l|l|l|}
+ \hline
+ Zeitraum & TPL/Autor(en) & Änderungen \\
+ \hline
+ Wintersemester 2017/18 & Maximilian Lenz & 
+  \\
+ \hline
+ \end{tabular}
+ \caption{Dokumentengeschichte}
+ \end{table}
+
+\section{Aufgabe der Komponente}
+\textbf{Web Map Services} rendern eine Karte basiert auf gewissen Parametern und liefern diese zur\"uck.
+ 
+
+\section{Architektur}
+
+\subsection{\"Uberlick}
+Grafik der Teile der Komponente (wichtig: Benennung aller Schnittstellen). 
+Anwendung der Komponente nennen (Use Case).
+
+Übliche Interaktionen durch Interaktionsdiagramme.
+
+(Ausfüllen in Prototyp-Phase)
+
+\subsection{Schnittstellendefinitionen}
+Der WMS kann \"uber 3 verschiedene Schnittstellen angesteuert werden.\\
+
+\paragraph{HTTP-Request}
+WMS kann direkte HTTP-Anfragen inklusive CQL bearbeiten. Diese Option ist die Basis der anderen Schnittstellen, aber ist f\"ur die Entwicklung von Anwendungen unpraktisch und zu zeitintensiv.
+
+\paragraph{SQL-Views}
+Layer k\"onnen mit Hilfe von SQL angepasst werden. Dies erm\"oglicht das filtern,stylen von Layern und die Nutzung von URL-Parametern. Auch wenn SQL-Views ein breites Anwendungsfeld abdecken, muss eine neue View f\"ur jede Layer angelegt werden. Dies macht SQL-Views unpraktikabel, wenn es um die Manipulation mehrerer Layer geht.
+
+\paragraph{JavaScript + OpenLayers}
+Der schnellste und sicherste Weg zum bearbeiten von Layern ist JavaScript. Die Struktur ist sehr \"ubersichtlich und bietet eine gute Dokumentation. Url-Parameter und Nutzereingaben lassen sich einfach einlesen und konvertieren. Zudem ist die Manipulation mehrerer Layer sehr einfach. 
+
+\subsection{genutztes Komponenten}
+Openlayers, Geoserver, WMS 1.0.0,\ldots
+
+(Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
+
+\section{Nutzung}
+
+\subsection{Code}
+Wo findet man den Code. Struktur des Codes. (In Prototyphase ausfüllen,
+kann dort sehr kurz sein. Ab Alpha-Phase konkret beschreiben.)
+\subsubsection{\"Ubersicht WMS}
 \begin{tabular}{ll}
 \emph{Operation} & \emph{Beschreibung} \\
 \hline 
@@ -15,7 +64,7 @@ DescribeLayer & Triggert \emph{WFS\footnote{Web Feature Service}} und liefert sp
 GetLegendGraphic & Liefert legend f\"ur die Karte \\ 
 \hline 
 \end{tabular} 
-\section{GetMap}\begin{tabular}{lcl}
+\subsubsection{GetMap}\begin{tabular}{lcl}
 \textbf{Parameter} & \textbf{notwendig} & \textbf{Beschreibung}\\
 \hline 
 service & Ja & Service(WMS) \\ 
@@ -63,7 +112,7 @@ request=GetMap\\
 \&format=image/png\\
 \hrule
 \newpage
-\section{GetCapabilities}
+\subsubsection{GetCapabilities}
 \begin{tabular}{lcl}
 \textbf{Parameter} & \textbf{notwendig} & \textbf{Beschreibung}\\
 \hline 
@@ -114,7 +163,7 @@ INTERSECTS(geometry, POINT (14.71 56.52))
 
 
 
-\section{Exceptions}
+\subsubsection{Exceptions}
 \begin{tabular}{ll} 
 Format & Syntax \\ 
 \hline 
@@ -131,7 +180,7 @@ JSON & exceptions=application/json \\
 JSONP & exceptions=text/javascript \\ 
 \hline 
 \end{tabular} 
-\section{GetFeatureInfo}
+\subsubsection{GetFeatureInfo}
 \begin{tabular}{lcl}
 \textbf{Parameter} & \textbf{notwendig} & \textbf{Beschreibung}\\
 \hline 
@@ -165,7 +214,7 @@ y & x & Y-Koordinate des zu untersuchenden Punktes \\
 \hline 
 \end{tabular} 
 
-\section{DescribeLayer}
+\subsubsection{DescribeLayer}
 \begin{tabular}{lcl} 
 \textbf{Parameter} & \textbf{notwendig} & \textbf{Beschreibung} \\ 
 \hline 
@@ -187,3 +236,43 @@ Text : text/xml\\
 GML2 :application/vnd.ogc.wms\_xml\\
 JSON :application/json\\
 JSONP :text/javascript\\
+
+\subsection{Deployment / Runtime}
+URL: Anfrage and die URL anh\"angen\\
+SQL-View: In der Adminmaske Layer ausw\"ahlen und ganz unten "SQL bearbeiten" ausw\"ahlen. Anleitung auf der Seite folgen.\\
+JavaScript: Nach OpenLayers3 Richtlinien Layer bearbeiten und zur Karte hinzug\"ugen.
+\paragraph{HTTP Requests}
+Keine Erl\"auterung, da diese Methode nicht genutzt werden sollte.\\
+\paragraph{URL-Parameter}
+Parameter k\"onnen nach den Richtlinien mit \& angeh\"angt werden. Hier gilt es zu beachten, dass eine Wms-Anfrage vorliegt (Url .../wms?...)\\
+\paragraph{JavaScript}
+Die HTML-Seite kann direkt bearbeitet werden (siehe ohdm.net Quellcode) um Layer hinzuzuf\"ugen oder l\"oschen. Auch Aussehen der Karte oder Filteroptionen f\"ur die Geometrien lassen sich hier einfach einf\"ugen.\\
+\section{Qualit\"atssicherung}
+
+\paragraph{URL-Parameter}
+Hier gilt Vorsicht beim anlegen der Parameter. Bei nichtgefilterten Parametern kann es sehr leicht zu einer SQL-Injection kommen. Das bedeutet, dass Daten ein-/ausgelesen werden k\"onnen oder ganze Datenbanken gel\"oscht werden. Geoserver bietet die Option in den SQL-Views "SQL-spezifische Zeichen maskieren". Dies beugt SQL-Injections vor. Als zus\"atzliche Maßnahme werden RegEx zur Validierung der Parameter benutzt.\\
+Werden diese Mechanismen genutzt,besteht kein Sicherheitsrisiko für SQL-Views.\\
+
+\paragraph{Javascript}
+Wird JavaScript zum Arbeiten mit Karten verwendet,besteht eine sehr geringes Sicherheitsrisiko. Daten im Backend können nicht zu schaden kommen oder aus versehen Überschrieben werden. Deshalb gibt es bei dieser Methodik keine Fallstricke zu beachten. 
+
+\subsection{Test}
+Die Komponente wird im Browser getestet.\\
+Beispiel URL-Parameter:\\
+\textbf{http://ohm.f4.htw-berlin.de:8080/geoserver/wfs?SERVICE=WFS\\
+\&VERSION=1.1.0\\
+\&REQUEST=GetFeature\\
+\&typeName=ohdm\_t:ohdm\_boundary\_lines\\
+\&filter=\textless Filter\textgreater \\
+ \textless PropertyIsEqualTo\textgreater \\
+\textless PropertyNamevalid\_since\textless /PropertyName\textgreater\\
+\textless Literal\textgreater 2016-03-19Z\textless /Literal\textgreater \\
+\textless /PropertyIsEqualTo\textgreater \\
+\textless /Filter\textgreater\\
+\&MAXFEATURES=20\\}\\
+
+
+Je nach Art der Anfrage (Request Type) wird eine Karte (png/jpeg/tiff/application) oder Featureinformationen (XML, GML) zurückgegeben. Diese sind im Browser einsehbar und ermöglichen schnelles Debugging. Bei Fehlern im Code wird eine EXception mit Fehlerbschreibung angezeigt. Diese Meldungen geben zwar oft keine genau Fehlerquelle an,aber helfen dabei das Problem einzugrenzen.
+\section{Vorschl\"age / Ausblick}
+Auch wenn die Funktionalität des WMS sehr umfangreich ist, gibt es einige Funktionalität,die man selbst schreiben muss. Diverse Funktionen zum editieren von mehreren Layers sind nicht implementiert, aber mit den Werkzeugen von \emph{Geoserver} und \emph{Openlayers3} lassen sich derartige Werkzeuge leicht schaffen und nach belieben anpassen für spezielle Anwendungsfälle.
+
