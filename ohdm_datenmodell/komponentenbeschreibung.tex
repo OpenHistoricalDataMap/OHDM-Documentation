@@ -4,16 +4,6 @@
  \hline
  Zeitraum & PL/Autor(en) & Änderungen \\
  \hline
- Sommersemester 1980 & IHR NAME & 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
- 
-  \\
- \hline
  Wintersemester 2017/18 & Behzad Karimi & 
 Erste Version des Textes eingefügt\newline 
 text \newline 
@@ -29,24 +19,20 @@ text \newline
  \end{table}
 
 \section{Aufgabe der Komponente}
-<<<<<<< Updated upstream
-%\begin{figure}[h!]
-%\centering
-%\includegraphics[width=127mm]{ohdm_datenmodell/ohdm_data_modell.png}
-%\caption{OHDM Datamodell}
+\begin{figure}[h!]
+\centering
+\includegraphics[page=1, width=127mm]{ohdm_datenmodell/Bilder/data.pdf}
+\caption{OHDM Datamodell}
+\label{fig:datamodell}
+\end{figure}
+%TODO Text zum Bild :)
 
-%\label{fig:datamodell}
-%\end{figure}
-
-
-=======
 \begin{figure}[h!]
 \centering
 \includegraphics[width=127mm]{ohdm_datenmodell/Bilder/ohdm_data_modell.png}
 \caption{OHDM Datamodell}
 \label{fig:datamodell}
 \end{figure}
->>>>>>> Stashed changes
 Im Datenmodell von OHDM geht alles vom Geoobjekt (geoobject) aus. Dieses zentrale Object beschreibt alle Modelle auf der Karte, da alle Informationen der Modelle auf das geobject verweisen. Das einzige Objekt worauf das geobject verweist, ist der Ersteller (external\_users). Der Ersteller des Objekts greift durch ein externes System (external\_systems) auf dern Server zu und gibt die Informationen über das Geobjekt weiter. Wie nun ein Geobjekt im Allgemeinen aussieht wird im nächsten Abschnitt beschrieben.
 
 \subsection{Geometrien in GIS}
@@ -57,39 +43,21 @@ Da OHDM mit PostGIS arbeitet (für GIS siehe ...) werden die zweidimensionalen O
 Das heißt ein Polygon kann ohne Punkte und Linien nicht existieren. Ebenso kann eine Linie ohne zwei Punkte nicht existieren. Wie erstellt man nun ein Gebäudekomplex aus mehreren Gebäuden? Diese sogenannten \textit{Multi-Polygone}, sind mehrere nicht überlappende Polygone. Dann gibt es noch die Möglichkeit Löcher in den Polygonen zu erstellen. Diese Löcher sind nichts weiter als ein Polygon in einem anderen Polygon. In GIS gibt es dabei folgende Einschränkungen:
 \begin{itemize}
 \item Polygone im inneren dürfen sich untereinander nicht überlappen. Falls doch, könnten sie auch als ein einzelnes Polygon dargestellt werden.
-\item Ein Rand eines inneren Polygons darf nicht Rand des äußeren Polygons sein. Falls dem nämlich so ist, wird das äußere Polygon nämlich anders dargestellt werden. %TODO @Behzad wie dargestellt? OGC Standard
-\item Aus dem oberen Satz lässti sich auch folgende Eigenschaft erklären. Kein Punkt des inneren Polygons darf gleichzeitig dem äußerem Polygon gehören. Hier würden ebenfalls das äußere Polygon ansonsten anders dargestellt werden. %TODO @Behzad auch hier, wie? Siehe oben
+\item Ein Rand eines inneren Polygons darf nicht Rand des äußeren Polygons sein. Falls dem nämlich so ist, wird das äußere Polygon nämlich anders dargestellt werden.
+\item Aus dem oberen Satz lässti sich auch folgende Eigenschaft erklären. Kein Punkt des inneren Polygons darf gleichzeitig dem äußerem Polygon gehören. Hier würden ebenfalls das äußere Polygon ansonsten anders dargestellt werden. 
 \end{itemize}
 %TODO  Rendering
-Wie genau nun Objekte enstehen und Polygone dargestellt werden, wird im Kapitel ( Diehe Kapitel Rendering) genauer erläutert. Damit die Polygone bzw. Geobjekte ordentlich auf der Karte  dargestellt werden können, teilem wir jedem Geoobjekt eine Klasse (class) zu. 
+Wie genau nun Objekte enstehen und Polygone dargestellt werden, wird im Kapitel ( Diehe Kapitel Rendering) genauer erläutert. Damit die Polygone bzw. Geobjekte ordentlich auf der Karte dargestellt werden können, teilem wir jedem Geoobjekt eine Klasse (class) zu. 
 
 \subsection{Klassifikation von Geoobjekten}
-Die Entity classification weißt mit einer ID auf das Geoobjekt hin und teilt diesen in eine bestimmte Klasse ein. Jede Klasse hat wiederum nochmals Unterklassen. Dadurch können wir Geoobjekte genau beschreiben um diese auf der Karte dementsprechend anzuzeigen. Zu Klassen gehört zum Beispiel: Geschäft, Gebäude, Autobahn, Büro, historisch, Tourismus, etc.. Zu den Unterklassen gehören Dinge wie: Bahnhof, Flugplatz, Fahrrad, Brücke, Busstation, etc.. %TODO @Behzad den Unterschied bitte genauer erklären, bin noch etwas verwirrt
-Nun können wir Geoobjekte darstellen und erklären zu welcher Klasse bzw. Unterklasse diese gehören. Wie nun genau ein Polygon dargestellt wird, erklären wir im nächsten Abschnitt.
+Die Entity classification weißt mit einer ID auf das Geoobjekt hin und teilt diesen in eine bestimmte Klasse ein. Jede Klasse hat wiederum nochmals Unterklassen. Dadurch können wir Geoobjekte genau beschreiben um diese auf der Karte dementsprechend anzuzeigen. Die genaue Einteilung der Klassen und Unterklassen kann man in den Datenbank Tabellen ablesen oder auf der Wiki Seite von \href{http://wiki.openstreetmap.org/wiki/Map_Features#Building}{OSM} finden. 
+Nun können wir Geoobjekte darstellen und erklären zu welcher Klasse bzw. Unterklasse diese gehören. Wie nun genau ein Polygon dargestellt wird und welche Informationen angezeigt werden, erklären wir im nächsten Abschnitt.
 
-\subsection{Der Inhalt eines Geoobjekts}
-Die Entity geoobject\_content verweist anhand einer ID auf die Instanz Inhalt (content). Dort wird beschrieben was genau das Geoobjekt ist. Wenn z.B. auf einer Karte die HTW zu erkennen ist und darauf geklickt wird, werden Informationen angezeigt die in dieser Instanz gespeichert sind. Zurück zur Instanz geoobject\_content. Dort werden Zeitliche Informationen gespeichert, wie z.B. bis wann das Objekt existierte. 
-Wir möchten nun in OHDM eine Möglichkeit haben, anhand einer URL auf spezifische Geoobjekte zuzugreifen. Damit das möglich ist gibt es zwei weitere Instanzen.
+\subsection{Informationen eines Geoobjekts}
+Die Informationen über ein Geoobjekt werden in den Instanzen geoobject\_content und content beschrieben. Dazu gehören auch die zeitlichen Informationen, die beschreiben, in welchem Zeitraum das Objekt existierte bzw. seit wann es existiert.  \\
+In der Instanz geobject\_url wird eine URL gespeichert die auf eine Webseite des Objektes verweist. Dies kann z.B. die Homepage, Wikipedia Eintrag, etc. sein. Dazu gibt es noch die Instanz url, hier können zusätzliche Links gespeichert werden mit weiteren Informationen über das jeweilige Geobjekt.s
 
-\subsection{URLs für Geoobjekte}
-In der Instanz URL (url) existiert eine URL womit direkt auf das verwiesene Geobjekt zugegriffen werden kann. Diese Instanz weist aber erst auf die Instanz geoobject\_url welche denselben Inhalte wie die Insatnz geoobject\_content speichert.
-%TODO @Behzad warum gibt es geoobject_content und geoobject_url wenn beide fast dieselben Attribute haben? warum nicht in eine Tabelle speichern? 
-
-vektorgeometrien über objekte
-1. Quelle OSM
-2. Quelle User die vektorgeometrien haben
-3. Quelle Editor zum einmalen
-
-Webschnittstelle die die Editoren untersützt
-Webschnittstelle für den Import
-
-\begin{figure}[h!]
-\centering
-\includegraphics[width=127mm]{ohdm_datenmodell/Bilder/data.jpg}
-\caption{OHDM Datamodell}
-\label{fig:datamodell}
-\end{figure}
-
+%TODO Webschnittstelle die die Editoren untersützt, Webschnittstelle für den Import
 
 \section{Architektur}
 
@@ -137,4 +105,3 @@ Wie wird die Komponente getestet.
 \section{Vorschläge / Ausblick}
 Was ist aufgefallen, was sollte man ändern? Löschen Sie auch gern die Kommentare
 der Vorgänger, aber nur, wenn es wirklich nicht mehr relevant ist.
-
