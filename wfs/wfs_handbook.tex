@@ -85,8 +85,7 @@ version  & Versionsnummer(1.1.0 oder 1.0.0) \\&Version darf nicht gekürzt werde
 request  & GetCapabilities \\ 
 \hline 
 \end{tabular}\\
-
-
+\vspace{2em}\\
 \textbf{Syntax}\\
 /geoserver/wfs?service=wfs\\
 request=GetCapabilities\\
@@ -171,19 +170,12 @@ srs & x & Koordinaten Referenz System (CRS)\\&& zb. srs=EPSG:3857\\
 \hline
 bbox & x& Boundingbox im Format a1,b1,a2,b2\\&& Darstellung abhängig vom CRS\\
 \end{tabular}
+\subsection{LockFeature}
+\ldots
+\subsection{Transaction}
+\ldots
+\subsection{GetGMLObject}
+\ldots
 \subsection{Test}
-Die Komponente wird im Browser getestet.\\
-Beispiel URL-Parameter:\\
-\textbf{http://ohm.f4.htw-berlin.de:8080/geoserver/wfs?SERVICE=WFS\\
-\&VERSION=1.1.0\\
-\&REQUEST=GetFeature\\
-\&typeName=ohdm\_t:ohdm\_boundary\_lines\\
-\&filter=\textless Filter\textgreater \\
- \textless PropertyIsEqualTo\textgreater \\
-\textless PropertyNamevalid\_since\textless /PropertyName\textgreater\\
-\textless Literal\textgreater 2016-03-19Z\textless /Literal\textgreater \\
-\textless /PropertyIsEqualTo\textgreater \\
-\textless /Filter\textgreater\\
-\&MAXFEATURES=20\\}\\
-
+\ldots
 \end{document}
