@@ -1,0 +1,189 @@
+
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\begin{document}
+\section{Dokumentengeschichte}
+\begin{table}[h]
+ \begin{tabular}{|l|l|l|}
+ \hline
+ Zeitraum & TPL/Autor(en) & Änderungen \\
+ \hline
+ Wintersemester 2017/18 & Maximilian Lenz & 
+  \\
+ \hline
+ \end{tabular}
+ \caption{Dokumentengeschichte}
+ \end{table}
+
+\section{Aufgabe der Komponente}
+\textbf{Web Map Services} rendern eine Karte basiert auf gewissen Parametern und liefern diese zur\"uck.
+ 
+
+\section{Architektur}
+\subsection{\"Uberlick}
+
+\begin{tabular}{ll}
+\emph{Operation} & \emph{Beschreibung} \\
+\hline 
+GetCapabilities & Liefert Metadaten, Operationen und m\"ogliche Layer \\ 
+\hline 
+DescribeFeatureType & Liefert Beschreibung des Features \\ 
+\hline 
+GetFeature & Liefert Feature(Geometrie + Attribute)\\ 
+\hline 
+LockFeature & Sperrt ein Feature und verhindert dessen Bearbeitung\\
+\hline 
+Transaction & Erstellt, Bearbeitet oder löscht ein Feature\\ 
+\hline 
+\end{tabular} 
+\paragraph{Updates}
+Ab \emph{WFS}2.0 können folgende Operationen genutzt werden:\\
+\begin{tabular}{ll}
+\emph{Operation} & \emph{Beschreibung} \\
+\hline 
+GetPropertyValue	 & Featurewert(e) abfragen mit Hilfe einer \emph{Query Expression}\\
+\hline 
+GetFeatureWithLock & Liefert Feature(s) und sperrt diese\\
+\hline 
+CreateStoredQuery	& Erzeugt eine \emph{Stored Query} auf dem Web Feature Server\\
+\hline 
+DropStoredQuery	& Löscht eine \emph{Stored Query} vom Web Feature Server\\
+\hline 
+ListStoredQueries&	Liefert eine Liste mit \emph{Stored Query} vom Web Feature Server\\
+\hline 
+DescribeStoredQueries	& Liefert ein Metadaten Dokument, welches die \\ & \emph{Stored Querys} beschreibt\\
+\hline 
+\end{tabular}
+\paragraph{Deprecated} Web Feature Services der Version 1.0.0 unterstützen die \emph{GetGMLObject} Opeartion.
+\\
+
+\begin{tabular}{ll}
+Operation & Beschreibung\\
+\hline
+GetGMLObject & Feature anhand von der \emph{ID} abfragen und als GML zurückliefern
+\end{tabular}
+
+
+
+\subsection{Schnittstellendefinitionen}
+Der Wfs kann \"uber URL-Parameter und HTTP-Requests genutzt werden.\\
+
+(Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
+
+\section{Nutzung}
+
+\subsection{GetCapabilities}
+\paragraph{Grundparameter} Diese Parameter müssen bei jedem Request benötigt. Geoserver ergänzt diese werte, falls Sie nicht spezifiziert werden. Die zu ergänzenden Parameter können in der Web-Admin-Seite eingesehen werden.\\
+\vspace{2em}\\
+\begin{tabular}{ll}
+\textbf{Parameter} & \textbf{Beschreibung}\\
+\hline 
+service  & Service(WFS) \\ 
+\hline 
+version  & Versionsnummer(1.1.0 oder 1.0.0) \\&Version darf nicht gekürzt werden (z.b. 1.0)\\ 
+\hline 
+request  & GetCapabilities \\ 
+\hline 
+\end{tabular}\\
+
+
+\textbf{Syntax}\\
+/geoserver/wfs?service=wfs\\
+request=GetCapabilities\\
+\&service=wfs\\
+\&version=1.0.0\\
+\&layers=ohdm\_t:boundary\_lines\\
+
+\hrule
+
+\paragraph{Rückgabewert}
+ Der \emph{Web Feature Service} liefert eine Antwort in XML. Das Format des Dokumentes variiert mit der installierten Version.
+ Dennoch folgen alle Versionen dem gleichen Grundprinzip, welches aus fünf Komponenten besteht:\\
+ \vspace{2em}\\
+ \begin{tabular}{ll}
+ Komponente & Beschreibung\\
+ \hline
+ ServiceIdentification	&Enthält Headerinformationen wie etwa Title oder \\& 
+ 							ServiceType. Der ServiceType beschreibt welche\\& \emph{WFS} Versionen ünterstützt sind\\
+\hline 							
+ ServiceProvider	 & Liefert Kontaktdaten zu der Personoder Firma, \\&die den Service gepublished hat.\\&( Email, Adresse, Telefon, \ldots )\\
+ \hline
+ OperationsMetadata	& Beschreibt Operationen die der \emph{WFS} Server unterstützt\\& und die Parameter dieser Operationen.\\
+ \hline
+FeatureTypeList & Liste der \emph{FeatureTypes} des \emph{WFS} Servers. Diese werden\\& in folgender Form aufgelistet: namespace:featuretype. \\& Zudem werden Projektion Typ und Bounding Box ausgegeben\\
+ \hline
+ Filter\_Capabilities	 & Liste der Filter(Expressions) Beispiel: 
+ 						\\& SpatialOperators (Equals, Touches),
+ 						\\& ComparisonOperators (LessThan, GreaterThan). 
+ 						\\& Die Filter an sich werden nicht zurückgegeben.\\
+ 						\hline
+ 
+ \end{tabular}
+\subsection{DescribeFeatureType}
+\begin{tabular}{lll}
+\emph{Parameter} & \emph{bentötigt} & \emph{Funktion} \\
+\hline
+service	& Ja & 	 WFS\\
+\hline
+version	& Ja &	 Version (1.0.0 oder 1.1.0)\\
+\hline
+request	& Ja &	DescribeFeatureType\\
+\hline
+typeName	& Ja &	Name des Featuretypen (typeNames für WFS über 1.1.0)\\
+\hline
+exceptions	& x 	& Format für Exceptions(default = application)\\
+\hline
+outputFormat &	x	 &  Rückgabeformat (scheme description language)\\
+\hline
+\end{tabular}\\
+\vspace{2em}\\
+\textbf{Syntax}\\
+/geoserver/wfs?service=wfs\\
+request=DescribeFeatureType\\
+\&service=wfs\\
+\&version=1.0.0\\
+\&typeNames=ohdm\_t:boundary\_lines\\
+
+\hrule
+\subsection{GetFeature}
+\begin{tabular}{lll}
+\emph{Parameter} & \emph{bentötigt} & \emph{Funktion} \\
+\hline
+service	& Ja & 	 WFS\\
+\hline
+version	& Ja &	 Version (1.0.0 oder 1.1.0)\\
+\hline
+request	& Ja &	GetFeature\\
+\hline
+typeName	& Ja &	namespace:layer (zb. ohdm\_t:boundary\_lines)\\
+\hline
+featureID & x & Filtert Layer nach Name\\
+\hline
+count & x & Limitiert die Ergebnisse (empfohlen)\\&& (count=250 ist Limit vieler Browser)\\
+\hline
+maxFeatures & x & Limitiert die Ergebnisse \\&&(maxFeatures=250 ist Limit vieler Browser)\\
+\hline
+sortBy & x & Sortiert die Features basierend auf einer Spalte \\&&der Datenbank. (zb. sortBy=valid\_since+A)\\&& +A/+D auf-/absteigend\\
+\hline
+propertyName & x & Liefert entsprechende Spalte der Datebank\\&&Mehrere Spalten können mit \emph{,} getrennt werden\\
+\hline
+srs & x & Koordinaten Referenz System (CRS)\\&& zb. srs=EPSG:3857\\
+\hline
+bbox & x& Boundingbox im Format a1,b1,a2,b2\\&& Darstellung abhängig vom CRS\\
+\end{tabular}
+\subsection{Test}
+Die Komponente wird im Browser getestet.\\
+Beispiel URL-Parameter:\\
+\textbf{http://ohm.f4.htw-berlin.de:8080/geoserver/wfs?SERVICE=WFS\\
+\&VERSION=1.1.0\\
+\&REQUEST=GetFeature\\
+\&typeName=ohdm\_t:ohdm\_boundary\_lines\\
+\&filter=\textless Filter\textgreater \\
+ \textless PropertyIsEqualTo\textgreater \\
+\textless PropertyNamevalid\_since\textless /PropertyName\textgreater\\
+\textless Literal\textgreater 2016-03-19Z\textless /Literal\textgreater \\
+\textless /PropertyIsEqualTo\textgreater \\
+\textless /Filter\textgreater\\
+\&MAXFEATURES=20\\}\\
+
+\end{document}
