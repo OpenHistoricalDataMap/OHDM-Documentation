@@ -1,7 +1,4 @@
 
-\documentclass[12pt]{article}
-\usepackage[utf8]{inputenc}
-\begin{document}
 \section{Dokumentengeschichte}
 \begin{table}[h]
  \begin{tabular}{|l|l|l|}
@@ -16,12 +13,15 @@
  \end{table}
 
 \section{Aufgabe der Komponente}
-\textbf{Web Map Services} rendern eine Karte basiert auf gewissen Parametern und liefern diese zur\"uck.
+\textbf{Web Feature Services} liefern Informationen zu gewissen \emph{Features(Layers)} anhand der \"ubergebenen Parameter. Der \emph{Web Feature Service} nutzt den \emph{WFS} um die zu rendernde Karte. Diese Informationen richten sich nach dem \emph{OGC}(Open Geospatial Consortium)\footnote{opengeospatial.org}
+
+\paragraph*{Features} werden im Kontext oft erwähnt. Hierbei handelt es sich um eine Ansammlung von Daten, welche aus bestimmten Layern bestehen. Diese Features können als Schnittstelle zu der Datenbank gesehen werden. Das Erstellen, Bearbeiten, Löschen, Lesen und Filtern von Datensätzen kann hiermit realisiert werden.
  
 
 \section{Architektur}
 \subsection{\"Uberlick}
-
+Der Web Feature Service (WFS) verfügt über mehrere Operationen, welche das direkte arbeiten mit Features erlauben. Jede Operation benötigt unterschiedliche Parameter um das gewünscht Ergebnis zu liefern. Operationen beinhalten : Kreieren, Editieren, Lesen und Löschen von Daten.\\
+\vspace{1em}\\
 \begin{tabular}{ll}
 \emph{Operation} & \emph{Beschreibung} \\
 \hline 
@@ -36,12 +36,13 @@ LockFeature & Sperrt ein Feature und verhindert dessen Bearbeitung\\
 Transaction & Erstellt, Bearbeitet oder löscht ein Feature\\ 
 \hline 
 \end{tabular} 
-\paragraph{Updates}
+\paragraph*{Updates}\label{differences}
 Ab \emph{WFS}2.0 können folgende Operationen genutzt werden:\\
+\vspace{1em}\\
 \begin{tabular}{ll}
 \emph{Operation} & \emph{Beschreibung} \\
 \hline 
-GetPropertyValue	 & Featurewert(e) abfragen mit Hilfe einer \emph{Query Expression}\\
+GetPropertyValue	 & Featurewert(e) abfragen mit Hilfe einer \\&\emph{Query Expression}(WFS 2+)\\
 \hline 
 GetFeatureWithLock & Liefert Feature(s) und sperrt diese\\
 \hline 
@@ -51,10 +52,10 @@ DropStoredQuery	& Löscht eine \emph{Stored Query} vom Web Feature Server\\
 \hline 
 ListStoredQueries&	Liefert eine Liste mit \emph{Stored Query} vom Web Feature Server\\
 \hline 
-DescribeStoredQueries	& Liefert ein Metadaten Dokument, welches die \\ & \emph{Stored Querys} beschreibt\\
+DescribeStoredQueries	& Liefert ein Metadaten Dokument, welches die \\ & \emph{Stored Querys} des WFS Servers beschreibt\\
 \hline 
 \end{tabular}
-\paragraph{Deprecated} Web Feature Services der Version 1.0.0 unterstützen die \emph{GetGMLObject} Opeartion.
+\paragraph*{Deprecated} Web Feature Services der Version 1.0.0 unterstützen die \emph{GetGMLObject} Opeartion.
 \\
 
 \begin{tabular}{ll}
@@ -65,15 +66,18 @@ GetGMLObject & Feature anhand von der \emph{ID} abfragen und als GML zurücklief
 
 
 
-\subsection{Schnittstellendefinitionen}
+\subsection*{Schnittstellendefinitionen}
 Der Wfs kann \"uber URL-Parameter und HTTP-Requests genutzt werden.\\
 
 (Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
 
 \section{Nutzung}
 
-\subsection{GetCapabilities}
-\paragraph{Grundparameter} Diese Parameter müssen bei jedem Request benötigt. Geoserver ergänzt diese werte, falls Sie nicht spezifiziert werden. Die zu ergänzenden Parameter können in der Web-Admin-Seite eingesehen werden.\\
+\subsection*{GetCapabilities}
+
+GetCapabilities beschreibt den \emph{WFS} und liefert mögliche Operationen und Layer kombiniert mit anderen Metadaten. \emph{Wichtig:} Im Vergleich zu anderen Services sind die Versionen des \emph{Web Feature Service} sehr unterschiedlich was die Syntax und die Operationen betrifft(siehe \ref{differences} ).
+\vspace{1em}\\
+\paragraph*{Grundparameter} Diese Parameter müssen bei jedem Request benötigt. Geoserver ergänzt diese werte, falls Sie nicht spezifiziert werden. Die zu ergänzenden Parameter können in der Web-Admin-Seite eingesehen werden.\\
 \vspace{2em}\\
 \begin{tabular}{ll}
 \textbf{Parameter} & \textbf{Beschreibung}\\
@@ -95,7 +99,7 @@ request=GetCapabilities\\
 
 \hrule
 
-\paragraph{Rückgabewert}
+\paragraph*{Rückgabewert}
  Der \emph{Web Feature Service} liefert eine Antwort in XML. Das Format des Dokumentes variiert mit der installierten Version.
  Dennoch folgen alle Versionen dem gleichen Grundprinzip, welches aus fünf Komponenten besteht:\\
  \vspace{2em}\\
@@ -118,7 +122,11 @@ FeatureTypeList & Liste der \emph{FeatureTypes} des \emph{WFS} Servers. Diese we
  						\hline
  
  \end{tabular}
-\subsection{DescribeFeatureType}
+\subsection*{DescribeFeatureType}
+
+Liefert Informationen über ein Feature.\emph{typeName} beschreibt hierbei den\\Name der Layer. 
+\vspace{1em}\\
+
 \begin{tabular}{lll}
 \emph{Parameter} & \emph{bentötigt} & \emph{Funktion} \\
 \hline
@@ -144,7 +152,11 @@ request=DescribeFeatureType\\
 \&typeNames=ohdm\_t:boundary\_lines\\
 
 \hrule
-\subsection{GetFeature}
+\subsection*{GetFeature}
+Liefert ein \emph{OGC-XML} Dokument mit Informationen zu den - in der Anfrage - spezifizierten Features(Geometrie, etc.). \emph{Wichtig:} Hierbei ist zu beachten, dass viele Browser den \emph{count} Parameter benötigen, um die Anzahl der Elemente zu limitieren. Ohne den Parameter kann der Browser abstürzen oder den Arbeitsspeicher überfüllen.\\
+\vspace{1em}\\
+
+
 \begin{tabular}{lll}
 \emph{Parameter} & \emph{bentötigt} & \emph{Funktion} \\
 \hline
@@ -170,12 +182,9 @@ srs & x & Koordinaten Referenz System (CRS)\\&& zb. srs=EPSG:3857\\
 \hline
 bbox & x& Boundingbox im Format a1,b1,a2,b2\\&& Darstellung abhängig vom CRS\\
 \end{tabular}
-\subsection{LockFeature}
-\ldots
-\subsection{Transaction}
-\ldots
-\subsection{GetGMLObject}
-\ldots
-\subsection{Test}
-\ldots
-\end{document}
+\subsection*{LockFeature}
+Muss noch getestet werden\ldots
+\subsection*{Transaction}
+Muss noch getestet werden\ldots
+\subsection*{GetGMLObject}
+Muss noch getestet werden\ldots
