@@ -7,6 +7,8 @@
  Wintersemester 2017/2018 & Georg Grauberger & 
 Aufgabe der Komponente \newline
 Architektur \newline
+genutzte Komponenten
+ \\
  \hline
  Wintersemester 1980/81 & IHR NAME & 
  \\
@@ -43,11 +45,34 @@ mit Vor- und Nachbedingungen. Beschreibuung des Protocol-Bindings.
 
 (Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
 
-\subsection{genutztes Komponenten}
-Beschreibung, welche weiteren Komponenten (in welchen Versionen, wo beziehbar) genutzt werden.
+\subsection{genutzte Komponenten}
 
-(Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
-
+\begin{table}[h]
+\begin{tabular}{|l|p{4cm}|}
+   \hline 
+   Komponente & Beschreibung \\
+   \hline
+   \href{https://docs.spring.io/spring-data/jpa/docs/current/reference/html/}{spring-boot-data-jpa} &
+    Ist verantwortlich fuer die Datenschicht, gibt Zugriff auf die Java Persistence API
+   \\ \hline
+   \href{https://docs.spring.io/spring-data/rest/docs/current/reference/html/}{spring-boot-starter-data-rest} &
+   Beinhaltet viele automatismen um schnell eine REST Schnittstelle zu schaffen.
+   \\ \hline
+   \href{https://docs.spring.io/spring-data/rest/docs/current/reference/html/#_the_hal_browser}{spring-data-rest-hal-browser} &
+   Beinhaltet einen REST Api browser mit dem man die Schnittstelle testen kann.
+   \\ \hline
+   \href{https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using-boot-starter}{spring-boot-starter-tomcat} &
+   Beinhaltet einen Tomcat Server so das man zum Lokalen Testen und Starten keine einzelstehende Instanz
+   vom Tomcat braucht.
+   \\ \hline
+   \href{https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-devtools.html}{spring-boot-devtools} &
+   Beinhaltet Konfiguration fuer Quickreload und Quickdeployment in der Entwicklungsumgebung.
+   \\ \hline
+   postgresql &
+   Beinhaltet den JDBC Treiber fuer PostGres.
+   \\ \hline
+\end{tabular}
+\end{table}
 \section{Nutzung}
 \subsection{Code}
 Wo findet man den Code. Struktur des Codes. (In Prototyphase ausfüllen,
