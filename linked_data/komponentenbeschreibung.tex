@@ -5,13 +5,11 @@
  Zeitraum & PL/Autor(en) & Änderungen \\
  \hline
  Wintersemester 2017/2018 & Georg Grauberger & 
-Aufgabe der Komponente \newline 
- 
-  \\
+Aufgabe der Komponente \newline
+Architektur \newline
  \hline
  Wintersemester 1980/81 & IHR NAME & 
- 
-  \\
+ \\
  \hline
  \end{tabular}
  \caption{Dokumentengeschichte}
@@ -31,7 +29,13 @@ Anwendung der Komponente nennen (Use Case).
 
 Übliche Interaktionen durch Interaktionsdiagramme.
 
-(Ausfüllen in Prototyp-Phase)
+Eine Spezifische Architektur fuer diese Komponente gibt es nicht, da wir die Richtlinien
+des Spring-Boot Frameworks verwenden.
+Als grobe zusammenfassung kann man jedoch sagen das das spring-boot das MVC Muster verwendet.
+Wir implementieren also mit unserem Code die Model Schicht indem wir ein Mapping
+fuer die Tabellen erstellen.
+Die View und der Controller werden von dem maven Plugin 'spring-boot-starter' erstellt.
+Das passiert automatisch da 'spring-boot' im Sinne von CoC agiert.
 
 \subsection{Schnittstellendefinitionen}
 Beschreibung der angebotenen Schnittstellen. Benennung der Funktionen
