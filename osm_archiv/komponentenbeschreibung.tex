@@ -1,19 +1,14 @@
 \section{Dokumentengeschichte}
 \begin{table}[h]
  \begin{tabular}{|l|l|p{4cm}|}
- \hline
- Zeitraum & PL/Autor(en) & Änderungen \\
- \hline
- Wintersemester 17/18 & Schwotzer, Thomas & 
-OSM parsen und Füllen Inter\-mediate DB
-   \\
- \hline
- Wintersemester 17/18 & IHR NAME & 
-text \newline 
-text \newline 
- 
-  \\
- \hline
+\hline
+		Wintersemester 17/18 & Schwotzer, Thomas & XML-Datei von OSM parsen und diese Daten in die Intermediate-DB speichern\\
+		\hline
+		
+		Wintersemester 17/18 & Sauer, Florian & Implementation einer Datenbankanbindung zu Intermediate-DB mittels Postgres-COPY \\
+		\hline
+		Wintersemester 17/18 & Wendt, Jan-Derk & Optimierung und Anpassung des XML-Default-Handlers an die neue Postgres-COPY-Anbindung\\
+		\hline
  \end{tabular}
  \caption{Dokumentengeschichte}
  \end{table}
@@ -118,6 +113,53 @@ Es gilt auch zu beachten, dass zwischen den Start und dem Ende eines Elements au
 die anderen drei Methoden {\tt addAttributes, addND, und addMember} aufgerufen werden
 können, die die {\tt INSERT}-Statement im weitere Parameter ergänzen.
 
+\subsection{COPY\_OSMImporter}
+Der {\tt COPY\_OSMImporter} implementiert {\tt DefaultHandler} und arbeitet wie folgt:
+
+\subsubsection{Begin / Ende Dokument}
+Der Parser erkennt den Beginn und das Ende des XML Dokuments. Diese Events werden jeweils
+einmal am Anfang und am Ende des Parse-Prozesses geworfen. Die Methoden {\tt startDocument()}
+und {\tt endDocument()} werden dabei aufgerufen. Bei Beginn wird eine Statusmeldung erzeugt.
+
+Am Ende wird die Anzahl von eingelesenen Hauptelementen ausgegeben.
+
+\subsubsection{Start / End Element}
+Der Parser ruft die Methode {\tt startElement()} auf, wenn er den Beginn eines XML
+Tags erkennt. Die Methode {\tt endElement()} wird gerufen, wenn das Ende eines
+XML Elements entdeckt wird. XML-Elemente können geschachtelt sein und sind es im
+OSM-XML-File auch. Einem Aufruf eines {\tt startElement()} können weitere Aufrufe
+der gleichen Methode folgen, weshalb der Zustand relevant ist, in dem der Aufruf erfolgt.
+
+Die beiden Methoden werden durch den XML-Handler implementiert. Es gibt sechs verschiedene
+Tags im OSM File. Die Tags {\tt node, way, relation} enthalten Beschreibungen von Punkten,
+Wegen oder Relationen. Die Tags {\tt tag, nd, member} treten nur innerhalb der Tags
+auf.
+
+Die ersten drei Tags dürfen nur als direkte Kindknoten der XML-Root
+auftauchen. Es wird deshalb geprüft, ob der Parser aktuell {\it außerhalb - OUTSIDE}
+war, d.h. auf der Ebene der Root. Es ist ein Fehler, wenn das nicht der Fall ist.
+
+Im Erfolgsfall wird für {\tt node, way, relation} die Methode {\tt startMainElement()} aufgerufen. Im Fall von {\tt tag, nd, 
+member} wird die Methode {\tt startInnerElement()} aufgerufen. In beiden Methoden folgen noch weiter Schritte und Unterscheidungen, welche u.A. im Quellcode selbst und im Javadoc dokumentiert sind.
+
+Das Tag {\tt tag} enthält weitere Informationen zu dem Element - das sind Attribute, 
+die später serialisiert mit dem jeweiligen Element in die Intermediate DB eingetragen werden. 
+Das Tag {\tt nd} gibt es nur innerhalb von {\tt way}-Tags und gibt die ID einer Node an, welche Teil des jeweiligen Ways ist. 
+Das Tag {\tt member} gibt es nur innerhalb einer {\tt relation} und gibt die ID einer Node, eines Ways oder einer Relation an, welche Teil der jeweiligen Relation ist.
+
+\subsubsection{startMainElement}
+Mit jedem Aufruf von {\tt startMainElement()} werden zwei formatierte Strings im csv-Format erstellt, welche nach und nach mit Inhalten gefüllt werden. Ein String enthält die Inhalte des jeweiligen aktiven Hauptelements Node, Way oder Relation. Der andere String enthält die ID's der jeweiligen zugehörigen Member (Waymember, Relationmember).
+
+Es ist zu beachten, dass die Strings erst mit dem Aufruf von {\tt endMainElement()} fertig gefüllt werden.
+
+Es gilt auch zu beachten, dass zwischen dem Start und dem Ende eines Hauptelements Methoden wie {\tt startInnerElement()} aufgerufen werden, welche die formatierten Strings mit weiteren Inhalten füllen.
+
+\subsubsection{endMainElement}
+Sobald das Ende eines Hauptelements erreicht ist, sind alle Inhalte für ein Hauptelement im formatierten String hinterlegt oder in Teilvariablen verfügbar um in den fertigen String übergeben zu werden.
+
+In dieser Methode und in der Methode {\tt startInnerElement()} wird der jeweils fertig formatierte String in 5 verschiedenen Situation (Node, Way, Relation, Waymember, Relationmember) an den jeweiligen {\tt DBCopyConnector} übergeben, welcher eine Methode ausführt, wo der formatierte String per COPY-Befehl in die SQL-DB geschrieben wird.
+
+
 \section{Utilities}
 \subsection{SQLStatementQueue}
 \label{SQLStatementQueue}
@@ -137,6 +179,61 @@ geschlossen werden und mittels psql ausgeführt werden.
 
 Die Implementierung dieser Klassen ist sehr stabil. {\bf Der Nutzung hat sich bewährt und ist in
 dieser Komponente Pflicht!}
+
+\subsection{CopyConnector}
+Der {\tt CopyConnector} ist ein Objekt, welches die Anbindung zur Intermediate Datenbank mithilfe des, in Postgres existierenden, 'COPY' Befehl herstellt.
+Der Vorteil des Postgres-'COPY' Befehls ist es, dass er sich fadür eignet, große mengen an Daten in die Datenbank zu importieren. Im Gegensatz zu einem einfügen mittels INSERT, muss hier nicht immer die Syntaktische Korrektheit des SQL-Befehls überprüft werden. Eine abschließende Überprüfung der Korrektheit der eingefügten Daten findet dennoch statt. Dies ist jedoch um ein vielfaches effizienter. 
+
+Der {\tt CopyConnector} benötigt zur Initialisierung einen Parameterfile, welcher neben Informationen zur Datenbank (Host, User, Passwort, Schema) auch Informationen zu den Tabellen selbst und den benötigten Spaltennamen enthält. Da die Tabellen der Intermediate Datenbank automatisch generierte IDs besitzen, müssen manche Tabellenspalten ignoriert werden bzw die benötigten explizit ausgewählt werden.
+Um Daten Reihenweise zur Datenbank zu schreiben, müssen diese in einem CSV formatierten Format zusammengefügt werden. Hier ist zu beachten, dass Sonderzeichen (Trennzeichen, Leerzeichen, Zeilenschaltungen, etc) korrekt escaped oder passend verpackt werden.
+
+\subsection{Parameter}
+{\tt Parameter} ist ein Objekt, das zum Parsen und speichern von Konfigurationsdateien genutzt wird. Um es zu initialisieren, muss eine configurationsdatei zum einlesen angegeben werden.
+Diese muss so strukturiert sein, dass pro zeile immer ein Key-Value paar existiert.
+Der Key wird jeweils mit einem Kolon (Doppelpunkt / ':') von einer Value abgetrennt.
+
+\begin{table}[h]
+ \begin{tabular}{|l|p{10cm}|}
+ \hline
+ Key Name & Beschreibung \\
+ \hline
+ servername & Die Hostadresse zum benutzenden Postgres Server (String)\\
+ \hline
+ portnumber & Die Portnummer zum benutzenden Postgres Server (Integer)\\
+ \hline
+ username & Der Username des zu Benutzenden Useraccounts des Postgres Servers (String)\\
+ \hline
+ pwd & Das Passwort für den angegebenen Useraccount (String)\\
+ \hline
+ dbname & Der Name der zu benutzenden Datenbank (String)\\
+ \hline
+ schema & Das zu benutzende Schema in der ausgewählten Datenbank (String)\\
+ \hline
+ connectionType & Der Typ der Anbindungsart, Verfügbar sind: 'copy', um die neue CopyConnector\-Schnittstelle zu benutzen; 'insert', um die alte SQL Insert Schnittstelle zu benutzen\\
+ \hline
+ delimiter & Das zu benutzende Trennzeichen, genutzt für die generierung von CSV Strings im CopyConnector\\
+ \hline
+ nodesColumnNames & Die zu benutzenden Spaltennamen der 'nodes'\-Tabelle. Die Spaltennamen werden mit | von einander abgetrennt.
+ Standartmäßig sollte der wert 'osm\_id|tstamp|classcode|otherclasscodes|serializedtags|longitude|latitude|has\_name|valid' eingetragen werden.\\
+ \hline
+ relationmemberColumnNames & Die zu benutzenden Spaltennamen der 'relationmember'\-Tabelle. Die Spaltennamen werden mit | von einander abgetrennt.
+ Standartmäßig sollte der wert 'relation\_id|node\_id|way\_id|member\_rel\_id|role' eingetragen werden.\\
+ \hline
+ relationsColumnNames & Die zu benutzenden Spaltennamen der 'relations'\-Tabelle. Die Spaltennamen werden mit | von einander abgetrennt.
+ Standartmäßig sollte der wert 'osm\_id|tstamp|classcode|otherclasscodes|serializedtags|member\_ids|has\_name|valid' eingetragen werden.\\
+ \hline
+ waynodesColumnNames & Die zu benutzenden Spaltennamen der 'waynodes'\-Tabelle. Die Spaltennamen werden mit | von einander abgetrennt.
+ Standartmäßig sollte der wert 'way\_id|node\_id' eingetragen werden.\\
+ \hline
+ waysColumnNames & Die zu benutzenden Spaltennamen der 'ways'\-Tabelle. Die Spaltennamen werden mit | von einander abgetrennt.
+ Standartmäßig sollte der wert 'osm\_id|tstamp|classcode|otherclasscodes|serializedtags|node\_ids|has\_name|valid' eingetragen werden.\\
+ \hline
+ \end{tabular}
+ \caption{Parameter Key Beschreibungen}
+ \end{table}
+ 
+%% todo fix table
+
 
 \section{Intermediate-to-OHDM}
 Der Quellcode dieser Teilkomponenten liegt im package {\tt osm2inter}.
