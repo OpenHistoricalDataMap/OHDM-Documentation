@@ -1,29 +1,29 @@
 \section{Dokumentengeschichte}
 \begin{table}[h]
- \begin{tabular}{|l|l|p{4cm}|}
-\hline
-		Wintersemester 17/18 & Schwotzer, Thomas & XML-Datei von OSM parsen und diese Daten in die Intermediate-DB speichern\\
+	\begin{tabular}{|l|l|p{4cm}|}
 		\hline
-		
-		Wintersemester 17/18 & Sauer, Florian & Implementation einer Datenbankanbindung zu Intermediate-DB mittels Postgres-COPY \\
+		Zeitraum & PL/Autor(en) & Änderungen \\
+		\hline
+		Wintersemester 17/18 & Schwotzer, Thomas & XML-Datei von OSM parsen und diese Daten in die Intermediate-DB speichern\\
 		\hline
 		Wintersemester 17/18 & Wendt, Jan-Derk & Optimierung und Anpassung des XML-Default-Handlers an die neue Postgres-COPY-Anbindung\\
 		\hline
- \end{tabular}
- \caption{Dokumentengeschichte}
- \end{table}
+		Wintersemester 17/18 & Sauer, Florian & Implementation einer Datenbankanbindung zu Intermediate-DB mittels Postgres-COPY \\
+		\hline
+	\end{tabular}
+	\caption{Dokumentengeschichte}
+\end{table}
 
 \section{Aufgabe der Komponente}
 Eine, wenn nicht die, wesentliche Quelle für OHDM ist Open Street 
 Map (OSM)\footnote{osm.org}.
+Eine, wenn nicht die, wesentliche Quelle für OHDM ist Open Street Map (OSM)\footnote{osm.org}.
 
-In einem {\it initialen Upload} wurde OHDM im Sommer 2017 mit
-den Daten des Planet.osm Files vom Januar 2017 gefüllt.
+In einem {\it initialen Upload} wurde OHDM im Sommer 2017 mit den Daten des Planet.osm Files vom Januar 2017 gefüllt.
 
-Diese Komponenten realisiert daneben das jährlich Update der
-OHDM Datenbank basierend auf OSM-Planet-Files.
+Diese Komponente realisiert ein optional erneutes initiales Einlesen der XML-Dateien und das jährliche Update der Intermediate-Datenbank basierend auf den XML-Dateien von OSM.
 
-Der Update-Prozess wird im Detail weiter unten beschrieben.
+Der Einlese- und Update-Prozess wird im Detail auf den nächsten Seiten beschrieben.
 
 \section{Architektur}
 Die Komponente teilt sich in zwei Subkomponenten:
@@ -114,7 +114,22 @@ die anderen drei Methoden {\tt addAttributes, addND, und addMember} aufgerufen w
 können, die die {\tt INSERT}-Statement im weitere Parameter ergänzen.
 
 \subsection{COPY\_OSMImporter}
-Der {\tt COPY\_OSMImporter} implementiert {\tt DefaultHandler} und arbeitet wie folgt:
+Der {\tt COPY\_OSMImporter} implementiert {\tt DefaultHandler} und ist zuständig für die Funktion und das Vorgehen des XML-Parsers.
+
+Die Funktionsweise ist ähnlich dem {\tt SQL\_OSMImporter}. Im Folgenden werden wahrscheinliche einige Aspekte wie oben erläutert. Jedoch sind auch einige Sachen neu und angepasst an die neue Situation.
+
+Die XML-Datei von OSM ist folgendermaßen aufgebaut:
+
+Es gibt 3 Arten von Hauptelementen und zwar Node, Way, Relation. Innerhalb dieser Hauptelemente können je nach Typ noch folgende innere Subelemente vorkommen: Tags, Waymember(nd), Relationmember(member).
+
+Tags können in jedem Hauptelement vorkommen, wobei Waymember(nd) nur innerhalb von Ways und Relationmember(member) nur innerhalb von Relations vorkommen können.
+
+Jedes Hauptelement hat mehr oder weniger gleiche Attribute, wie z.B. ID, User, User-ID. Es gibt auch elementspezifische Attribute wie z.B. die Koordinaten bei den Nodes.
+
+\subsubsection{grobe Funktionsweise}
+Der Handler des XML-Parsers fängt die öffnenden und schließenden Tags der 6 Elementarten ab und kann so auf diese Daten zugreifen und mit eigener Struktur formatieren, damit diese daraufhin vom {\tt CopyConnector} in die Intermediate-DB gespeichert werden können.
+
+Die Klasse {\tt COPY\_OSMImporter} ist der Handler des XML-Parsers und erbt von DefaultHandler. Die grobe Arbeitsweise ist im folgenden kurz erläutert.
 
 \subsubsection{Begin / Ende Dokument}
 Der Parser erkennt den Beginn und das Ende des XML Dokuments. Diese Events werden jeweils
@@ -157,8 +172,17 @@ Es gilt auch zu beachten, dass zwischen dem Start und dem Ende eines Hauptelemen
 \subsubsection{endMainElement}
 Sobald das Ende eines Hauptelements erreicht ist, sind alle Inhalte für ein Hauptelement im formatierten String hinterlegt oder in Teilvariablen verfügbar um in den fertigen String übergeben zu werden.
 
-In dieser Methode und in der Methode {\tt startInnerElement()} wird der jeweils fertig formatierte String in 5 verschiedenen Situation (Node, Way, Relation, Waymember, Relationmember) an den jeweiligen {\tt DBCopyConnector} übergeben, welcher eine Methode ausführt, wo der formatierte String per COPY-Befehl in die SQL-DB geschrieben wird.
+In dieser Methode und in der Methode {\tt startInnerElement()} wird der jeweils fertig formatierte String in 5 verschiedenen Situation (Node, Way, Relation, Waymember, Relationmember) an den jeweiligen {\tt CopyConnector} übergeben, welcher eine Methode ausführt, wo der formatierte String per COPY-Befehl in die SQL-DB geschrieben wird.
 
+\subsubsection{Schnittstellendefinitionen}
+Da der Handler nur für diese konkrete Situation spezialisiert ist und keine allgemeinnützigen Funktionen bereitstellt, bietet diese Teilkomponente keine Schnittstellen nach außen an.
+
+\subsubsection{genutzte Komponenten}
+Der XML-Handler nutzt neben der Klasse {\tt CopyConnector} zwei weitere Klassen, welche diverse Hilfsmethoden zur Organisation und Einordnung der XML-Elemente zur Verfügung stellen.
+
+Die beiden Klassen {\tt OSMClassificationCopyImport} und {\tt UtilCopyImport} sind mit vorhanden und müssen nicht extra bezogen werden. Eine grobe Funktionsweise und Übersicht ist im Quellcode selbst und im Javadoc zur Verfügung gestellt.
+
+Darüber hinaus nutzt diese Teilkomponente keine weiteren Komponenten des Systems.
 
 \section{Utilities}
 \subsection{SQLStatementQueue}
@@ -245,30 +269,31 @@ Objekt, das die Klasse {\tt DefaultHandler} implementiert.
 Der Parser parsed darauf das OSM-File. Sobald ein neues XML-Element gefunden wurde,
 wird eine entsprechende Methode auf dem DefaultHandler aufgerufen. 
 
+
+
 \section{Nutzung}
 Der Code befindet sich im Repository {\tt OSMUpdateInsert}\footnote{https://github.com/OpenHistoricalDataMap/OSMImportUpdate}
+
 \subsection{Code}
-Wo findet man den Code. Struktur des Codes. (In Prototyphase ausfüllen,
-kann dort sehr kurz sein. Ab Alpha-Phase konkret beschreiben.)
+Der {\tt COPY\_OSMImporter} ist in Java geschrieben und ist im package {\tt osm2inter} im Respository von Github zu finden. Die zusätzlichen Hilfsklassen und allen nötigen Abhängigkeiten(Dependencies), zusätzlichen Libraries und weiteren Tools sind im package {\tt util} und {\tt osm} im Respository von Github.
 
 \subsection{Deployment / Runtime}
-Beschreibung wie die Komponenten aus dem Quellcode erzeugt werden kann,
-wie sie installiert wird und wie man sie startet.
+Der {\tt COPY\_OSMImporter} kann nicht ohne weiteren Code ausgeführt werden. Er ist sozusagen eine Art Library, welche für einen XML-Parser verwendet werden kann. In unserem Fall startet die Klasse {\tt OSM\_Import} den XML-Parser und benutzt den {\tt COPY\_OSMImporter}.
 
 \section{Qualitätssicherung}
-(Ausfüllen ab Alpha-Phase).
 
-Wie erfolgt die Sicherung der Qualität? Keine Romane, sondern ehrlich notieren,
-was man tut. Wenn man nichts tut, dann steht hier: Wir sichern die Qualität der
-Komponente nicht.
-
-Issue-Tracking: wie erfolgt das, interne Fehlermeldungen (ab Alpha), 
-externe Fehlermeldungen ab Beta.
+\subsection{Fehlercatching / Sicherheit}
+Der {\tt COPY\_OSMImporter} überprüft jegliche Art von Fehlern, ungewollten Situationen, falschen oder nicht vorhandenen Werten / Inhalten. Nur in den jeweiligen Best-Cases wird fortgefahren um falsche oder fehlende XML-Inhalte zu vermeiden. Sobald kein Best-Case vorhanden ist wird ein Standartoutput mit Log, Status und Zeilennummer der XML-Datei getätigt.
 
 \subsection{Test}
-Wie wird die Komponente getestet.
+Beim {\tt COPY\_OSMImporter} wurde während der Implementierungsphase mehrere Male im Adhoc-Stil eine XML-Datei absichtlich mit Fehlern gefüllt um zu gucken was passiert, wenn z.B. das Adminlevel keine gerechte Integerzahl beinhaltet, oder wenn die Schachtelung der Tags nicht ordnungsgemäß vorhanden ist.
+
+In diesen Fällen wird alles ordnungsgemäß behandelt, was bedeutet das z.B. bei einer nicht gerechten Integerzahl das AdminLevel wieder auf 0 gesetzt wird. Bei allen vorkommenden XML-Fehlern wird versucht, dass der XML-Parser weiterläuft und die Fehler lediglich loggt. Sobald jedoch die Schachtelung / Struktur der XML-Datei fehlerhaft ist werden die jeweiligen Inhalte übersprungen, damit keine falschen Inhalte in die DB gelangen können. Dies wird natürlich auch geloggt jedoch nicht weiter behandelt, was dazu führt, dass Inhalte der XML-Datei nicht verarbeitet werden.
 
 \section{Vorschläge / Ausblick}
-Was ist aufgefallen, was sollte man ändern? Löschen Sie auch gern die Kommentare
-der Vorgänger, aber nur, wenn es wirklich nicht mehr relevant ist.
+Die Logik des {\tt COPY\_OSMImporter} an sich ist schon relativ weit ausgereift. Es werden alle möglichen Tag-Arten und Inhalte erkannt und verarbeitet.
+
+Es sollte jedoch noch etwas am Fehlerhandling geändert / verbessert werden. Vor allem sollte eine andere / weitere Bewältigungsart bei Strukturfehlern in der XML-Datei entwickelt werden, damit keine Inhalte der XML-Datei übersprungen werden und somit erstmal verloren gehen. Auch wenn die XML-Dateien von OSM zu hoher Wahrscheinlichkeit keine Strukturfehler haben muss man trotzdem mit allen Situationen rechnen.
+
+Zudem sollte der XML-Handler in so wenig wie möglichen wenn nicht sogar in garkeinen Situationen abbrechen / beenden, was jedoch bei den geworfenen SQL-Exceptions vom {\tt CopyConnector} der Fall ist.
 
