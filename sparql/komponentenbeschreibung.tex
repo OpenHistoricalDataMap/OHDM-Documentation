@@ -4,17 +4,7 @@
  \hline
  Zeitraum & PL/Autor(en) & Änderungen \\
  \hline
- Sommersemester 1980 & IHR NAME & 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
- 
-  \\
- \hline
- Wintersemester 1980/81 & IHR NAME & 
+ Wintersemester 2017/2018 & IHR NAME & 
 text \newline 
 text \newline 
 text \newline 
@@ -29,6 +19,13 @@ text \newline
  \end{table}
 
 \section{Aufgabe der Komponente}
+
+Server
+
+Der Fuseki-Server verwaltet RDF-Dateien. Diese können in .rdf Format oder in .owl Formal in datasets hochgeladen werden.
+In den datasets kann man auf die Triples in den Tabellen mit querys zugreifen. Ausgabe der Tabellen in JSON, XML, CSV und TSV als Raw Response. Raw Response auch zum direkt runterladen verfügbar. Die datasets auf den die Triples gelagert sind, kann man auch selbst erstellen unter "manage datasets" - > "add new dataset". Nach Bedarf "In-memory" oder "Persistens".
+
+
 Verbale kurze prägnante Beschreibung, was die Komponente leisten soll.
 Das sind wenige Seiten.
 
@@ -51,6 +48,21 @@ mit Vor- und Nachbedingungen. Beschreibuung des Protocol-Bindings.
 (Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
 
 \subsection{genutztes Komponenten}
+
+Server
+
+Den Server kann man direkt auf der Homepage jena.apache.org runterladen (aktuelle Version 3.6.0).
+Nach dem entpacken muss man den "fuseki-server" mit chmod die Ausführrechte geben.
+Anschließend kann man dann mit ./fuseki-server den Server zum laufen bringen.
+Der Server läuft dann standartmäßig auf dem Port 3030 (Portfreigabe erforderlich).
+Andere Ports möglich mit "./fuseki-server --port=*number*".
+
+Im Verzeichnis run/ in der Datei shiro.ini kann man die Rechte vergeben.
+Standart User, die nicht erstellt werden müssen, sind "anon" und "localhostFilter".
+Um die Rechte für jeden Nutzer zu setzen muss man "anon" bearbeiten.
+Um lokal die Rechte zu vergeben bearbeitet man "localhostFilter".
+Zusätzlich kann man unter "[users]" eigene Nutzer mit Passwort setzen, den man dann auch Rechte vergeben.
+
 Beschreibung, welche weiteren Komponenten (in welchen Versionen, wo beziehbar) genutzt werden.
 
 (Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
