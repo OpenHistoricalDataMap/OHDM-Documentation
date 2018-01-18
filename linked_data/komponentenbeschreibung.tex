@@ -4,36 +4,25 @@
  \hline
  Zeitraum & PL/Autor(en) & Änderungen \\
  \hline
- Sommersemester 1980 & IHR NAME & 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
- 
-  \\
+ Wintersemester 2017/2018 & Georg Grauberger & 
+Aufgabe der Komponente \newline
+Architektur \newline
+genutzte Komponenten
+ \\
  \hline
  Wintersemester 1980/81 & IHR NAME & 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
- 
-  \\
+ \\
  \hline
  \end{tabular}
  \caption{Dokumentengeschichte}
  \end{table}
 
 \section{Aufgabe der Komponente}
-Verbale kurze prägnante Beschreibung, was die Komponente leisten soll.
-Das sind wenige Seiten.
-
-(Ausfüllen in Prototyp-Phase)
-
+Die Aufgabe der Linked Data Schnittstelle ist es die OHDM Datenbank ueber
+eine REST Schnittstelle im WWW verfuegbar zu machen.\newline
+Die Daten sollen dann aufeinander verweisen so das man durch diese navigieren
+kann. Die Objekte die durch die Schnittstelle freigegeben werden sind Geoobjekte
+im geoJson Format.
 \section{Architektur}
 
 \subsection{Überlick}
@@ -42,7 +31,13 @@ Anwendung der Komponente nennen (Use Case).
 
 Übliche Interaktionen durch Interaktionsdiagramme.
 
-(Ausfüllen in Prototyp-Phase)
+Eine Spezifische Architektur fuer diese Komponente gibt es nicht, da wir die Richtlinien
+des Spring-Boot Frameworks verwenden.
+Als grobe zusammenfassung kann man jedoch sagen das das spring-boot das MVC Muster verwendet.
+Wir implementieren also mit unserem Code die Model Schicht indem wir ein Mapping
+fuer die Tabellen erstellen.
+Die View und der Controller werden von dem maven Plugin 'spring-boot-starter' erstellt.
+Das passiert automatisch da 'spring-boot' im Sinne von CoC agiert.
 
 \subsection{Schnittstellendefinitionen}
 Beschreibung der angebotenen Schnittstellen. Benennung der Funktionen
@@ -50,11 +45,34 @@ mit Vor- und Nachbedingungen. Beschreibuung des Protocol-Bindings.
 
 (Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
 
-\subsection{genutztes Komponenten}
-Beschreibung, welche weiteren Komponenten (in welchen Versionen, wo beziehbar) genutzt werden.
+\subsection{genutzte Komponenten}
 
-(Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
-
+\begin{table}[h]
+\begin{tabular}{|l|p{4cm}|}
+   \hline 
+   Komponente & Beschreibung \\
+   \hline
+   \href{https://docs.spring.io/spring-data/jpa/docs/current/reference/html/}{spring-boot-data-jpa} &
+    Ist verantwortlich fuer die Datenschicht, gibt Zugriff auf die Java Persistence API
+   \\ \hline
+   \href{https://docs.spring.io/spring-data/rest/docs/current/reference/html/}{spring-boot-starter-data-rest} &
+   Beinhaltet viele automatismen um schnell eine REST Schnittstelle zu schaffen.
+   \\ \hline
+   \href{https://docs.spring.io/spring-data/rest/docs/current/reference/html/#_the_hal_browser}{spring-data-rest-hal-browser} &
+   Beinhaltet einen REST Api browser mit dem man die Schnittstelle testen kann.
+   \\ \hline
+   \href{https://docs.spring.io/spring-boot/docs/current/reference/htmlsingle/#using-boot-starter}{spring-boot-starter-tomcat} &
+   Beinhaltet einen Tomcat Server so das man zum Lokalen Testen und Starten keine einzelstehende Instanz
+   vom Tomcat braucht.
+   \\ \hline
+   \href{https://docs.spring.io/spring-boot/docs/current/reference/html/using-boot-devtools.html}{spring-boot-devtools} &
+   Beinhaltet Konfiguration fuer Quickreload und Quickdeployment in der Entwicklungsumgebung.
+   \\ \hline
+   postgresql &
+   Beinhaltet den JDBC Treiber fuer PostGres.
+   \\ \hline
+\end{tabular}
+\end{table}
 \section{Nutzung}
 \subsection{Code}
 Wo findet man den Code. Struktur des Codes. (In Prototyphase ausfüllen,
