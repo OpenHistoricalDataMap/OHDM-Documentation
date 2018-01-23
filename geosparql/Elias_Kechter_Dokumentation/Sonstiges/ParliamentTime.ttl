@@ -1,0 +1,48 @@
+# baseURI: http://bbn.com/ParliamentTime
+# imports: http://www.w3.org/2006/time
+
+@prefix : <http://bbn.com/ParliamentTime#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix time: <http://www.w3.org/2006/time#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://bbn.com/ParliamentTime>
+  rdf:type owl:Ontology ;
+  owl:imports <http://www.w3.org/2006/time> ;
+  owl:versionInfo "Created with TopBraid Composer"^^xsd:string ;
+.
+:TemporalFeature
+  rdf:type owl:Class ;
+  rdfs:label "Temporal feature"^^xsd:string ;
+  rdfs:subClassOf owl:Thing ;
+.
+:asInstant
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain time:Instant ;
+  rdfs:label "as instant"^^xsd:string ;
+  rdfs:range xsd:dateTime ;
+.
+:asInterval
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain time:ProperInterval ;
+  rdfs:label "as interval"^^xsd:string ;
+  rdfs:range :intervalLiteral ;
+.
+:instantEquals
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain time:Instant ;
+  rdfs:label "instant equals"^^xsd:string ;
+  rdfs:range time:Instant ;
+.
+:intervalLiteral
+  rdf:type rdfs:Datatype ;
+  rdfs:label "interval literal"^^xsd:string ;
+.
+:temporalExtent
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain :TemporalFeature ;
+  rdfs:label "temporal extent"^^xsd:string ;
+  rdfs:range time:TemporalEntity ;
+.

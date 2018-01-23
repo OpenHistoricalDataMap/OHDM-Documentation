@@ -1,0 +1,10 @@
+SELECT ?monument ?park
+WHERE {
+?monument a <http://www.example.org/POI#Monument> ;
+<http://www.opengis.net/ont/geosparql#hasGeometry> ?mgeo .
+
+?park a <http://www.example.org/POI#Park> ;
+<http://www.opengis.net/ont/geosparql#hasGeometry> ?pgeo .
+
+?mgeo <http://www.opengis.net/ont/geosparql#sfWithin> ?pgeo .
+}

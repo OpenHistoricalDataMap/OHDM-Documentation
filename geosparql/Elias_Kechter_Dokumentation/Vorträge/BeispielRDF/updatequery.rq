@@ -1,0 +1,11 @@
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix geo: <http://www.opengis.net/ont/geosparql#>
+prefix ex: <http://www.example.org/POI#>
+prefix sf: <http://www.opengis.net/ont/sf#>
+
+DELETE DATA
+{ ex:NationalMall rdfs:label "National Mall" }
+
+INSERT DATA
+{ ex:NationalMall rdfs:label "National Mall 2.0" }
