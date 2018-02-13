@@ -1,3 +1,5 @@
+\graphicspath{ {img/} }
+
 \section{Dokumentengeschichte}
 \begin{table}[h]
  \begin{tabular}{|l|l|p{4cm}|}
@@ -75,12 +77,67 @@ mit Vor- und Nachbedingungen. Beschreibuung des Protocol-Bindings.
 \end{table}
 \section{Nutzung}
 \subsection{Code}
-Wo findet man den Code. Struktur des Codes. (In Prototyphase ausfüllen,
-kann dort sehr kurz sein. Ab Alpha-Phase konkret beschreiben.)
+Den Code der Schnittstelle kann man auf GitHub über den Link finden: \\
+\url{https://github.com/OpenHistoricalDataMap/LOD} \\
+\\
+Für die Realisierung der Schnittstelle wurde MVC-Framework Spring-Boot 
+verwendet, dadurch hat der Code folgende Struktur: \\
+\\
+\includegraphics[scale=0.7]{image} \\
+\\
+\\
+Alle notwendige Einstellungen für die Verbindung mit dem GeoServer sind 
+in der Datei \textbf{application.properties} zu finden.
+Modelle und deren Repositorien liegen entsprechend in Verzeichnissen 
+\textbf{model} und \textbf{repository}. \\
+\\
+\\
+\\
+Struktur von \textbf{application.properties}:
+
+\lstset{frame=single,basicstyle=\ttfamily\footnotesize,breaklines=true}
+
+\begin{lstlisting}
+# Datenquelle
+spring.datasource.url = jdbc:[Driver]://[Host]:[Port]/[Datenbank]
+spring.datasource.username = [Benutzername]
+spring.datasource.password = [Passwort]
+
+# Datenbank beim Startup initializieren
+spring.jpa.hibernate.ddl-auto = [none|validate|update|create|create-drop]
+
+spring.jpa.properties.hibernate.dialect = [Dialekt]
+spring.jpa.properties.hibernate.default_schema = [DefaultSchema]
+\end{lstlisting}
+\vspace{5mm}
+\noindent
+Beispielhafte Einstellungen in \textbf{application.properties}:
+
+\begin{lstlisting}
+spring.datasource.url = jdbc:postgresql://htw.de:8000/test
+spring.datasource.username = mustermann
+spring.datasource.password = admin1234
+
+spring.jpa.hibernate.ddl-auto = none
+spring.jpa.properties.hibernate.dialect = org.hibernate.dialect.PostgreSQL9Dialect
+spring.jpa.properties.hibernate.default_schema = ohdm
+\end{lstlisting}
 
 \subsection{Deployment / Runtime}
 Beschreibung wie die Komponenten aus dem Quellcode erzeugt werden kann,
-wie sie installiert wird und wie man sie startet.
+wie sie installiert wird und wie man sie startet.\\
+\\
+Das LOD-Server kann lokal durch die Kommandozeile mit folgenden Befehle aus 
+dem Root-Verzeichnis des Projektes gestartet werden:\\
+\\
+Windows:
+\begin{lstlisting}
+mvnw.cmd spring-boot:run
+\end{lstlisting}
+Linux und macOS:
+\begin{lstlisting}
+mvnw spring-boot:run
+\end{lstlisting}
 
 \section{Qualitätssicherung}
 (Ausfüllen ab Alpha-Phase).
