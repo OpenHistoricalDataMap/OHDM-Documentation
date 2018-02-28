@@ -297,3 +297,44 @@ Es sollte jedoch noch etwas am Fehlerhandling geändert / verbessert werden. Vor
 
 Zudem sollte der XML-Handler in so wenig wie möglichen wenn nicht sogar in garkeinen Situationen abbrechen / beenden, was jedoch bei den geworfenen SQL-Exceptions vom {\tt CopyConnector} der Fall ist.
 
+\section{Intermediate to OHDM}
+\subsection{Initial import}
+TODO
+\subsection{OSM update}
+
+Some preliminaries: OSM is probably the most import source of historic information for OHDM for
+next couple of years. OHDM is meant to be an OSM archive. In a regular manner (we think of an annual
+update) OSM files are retrieved. Those files are imported as described above. Afterwards, it is
+figured out:
+
+\begin{itemize}
+\item Which data hasn't changed at all (which is probably the vast majority)
+\item Which geometries have changed
+\item Which description have changed
+\item Which data are deleted
+\end{itemize}
+
+Removed data remain unchanged in OHDM - they became literally history. Handling unchanged data is
+pretty simple: Validity of object -- geometry relation can be extended to the data of update.
+
+Changes in objects OR geometries result in a creation of OHDM objects OR geometries, Those
+newly created objects OR geometries are referenced to the unchanged geometries OR objects
+with the geometry-object-table in OHDM.
+
+Changes of both, geometries and objects can be considered as identical to a creation of
+a complete new data set and can be handled like an initial insert.
+
+The follow section is organized as follows:
+
+\begin{enumerate}
+\item It is defined how to identify the different cases.
+\item (Little) algorithms are described what changes could trigger other changes
+(e.g. a changed node has impact on ways using that node)
+\item It is described how to deal with those changes to update the database (templates
+of SQL statements are used whenever possible)
+\end{enumerate}
+
+
+
+
+
