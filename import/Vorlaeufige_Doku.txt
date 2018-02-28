@@ -1,0 +1,44 @@
+Doku
+
+Aufgabenstellung
+Es wurde während des 5. Semesters im Modul “Ausgewählte Kapitel mobiler Anwendungen” die Aufgabe gestellt, einen Geodaten-Editor zu erstellen. Mit diesem Editor soll es möglich sein, Geo-Objekte aus einer Datenbank auszuwählen und mit einer Beziehung zu einem anderen Objekt zu versehen. Somit soll eine Aussage erstellt werden, die an einem gewissen Wahrheitsgehalt gemessen werden kann.
+
+Nutzen
+Der Editor dient als Interface zur Erstellung von Aussagen. Mit Hilfe des Editors sollen Objekte aus einer OHDM-Datenbank (PostgreSQL) herausgenommen werden können und mit anderen Geo-Objekten aus der selben Datenbank beziehungsweise komplett neuen Objekt in Verbindung gebracht werden. Es wird ein JSON-Objekt mit den Eingaben des Benutzers erstellt. Dieses JSON-Objekt kann verwendet werden, um die Aussage die getroffen wurde, in einen RDF-Graphen umzuwandeln und dadurch repräsentiert wird. 
+ 
+Layout
+Aus der Aufgabenstellung ging heraus, dass der Editor zunächst nur ein schlichtes Design haben soll. Die Überlegung war es, den Editor mittels HTML und PHP zu erstellen, um dies auf einem entsprechenden Browser nutzen zu können. 
+Der Aufbau sie wie folgt aus: 
+im ersten Feld befindet sich eine Drop-Down-Menü, welche mit Geo-Objekten aus der OHDM-Datenbank gefüllt ist. Zur Zeit beschränkt sich die Anzahl der aufgelisteten Einträge auf 100. Darunter ist ein weiteres Drop-Down-Menü, welches die Prädikate beziehungsweise die Beziehungsmöglichkeiten enthält. Darauf folgen zwei Felder, ein blankes Feld, welches die Möglichkeit gibt, ein Bezugsobjekt manuell einzutragen wie z.B. in Form eines Links, welches zu einem Beitrag führt. Das zweite Feld beinhaltet wieder ein Drop-Down-Menü, welches mit Geo-Objekten gefüllt ist, um damit einen Bezug herstellen zu können. Es soll dem Nutzer des Interfaces die Auswahl gelassen werden, auf welche Weise die Aussage erstellt wird. Es kann ein beliebiges Objekt aus der Datenbank sein oder ein komplett neues. 
+
+Weitere Designentscheidungen stehen noch offen und werden mit dem Projektleiter besprochen.
+
+
+Überlegung sinnvoller Prädikate
+Es wurde eine große Liste mit derzeit etwa 50 Beziehungen erstellt, die als Auswahlliste im Editor zur Verfügung steht. Im Verlauf der Entwicklung können neue Prädikate die eine Beziehung beschreiben hinzugefügt werden. Die Liste der Prädikate ist eine Textdatei, die beliebig fortgeführt werden kann.
+
+Funktionsweise
+Die Funktionsweise wurde in mehrere Abschnitte unterteilt, um eine bessere Wartung zu ermöglichen:
+Datenbankverbindung
+Prädikat-Sammlung
+Editor
+
+Datenbankverbindung:
+Hier wird die Verbindung zum Datenbankserver ermöglicht und gespeichert. Aus Sicherheitsgründen müsste überlegt werden, wie mit den Verbindungsdaten umgegangen wird. Zur Zeit sind diese als “Klartext” in der Datei geschrieben.
+
+Prädikat-Sammlung:
+In dieser Datei sind die Beziehungsmöglichkeiten eingetragen, die im Editor im Drop-Down-Menü auswählbar sind. Die Prädikate sind nicht alphabetisch geordnet, also könnten bei weiterer Pflege Dopplungen vorkommen. Zur Zeit beläuft sich die Anzahl auf 50 sinnvolle Prädikate. In Zukunft können weitere Prädikate hinzugefügt werden.
+
+Editor:
+Der Editor ist, wie im Abschnitt Layout beschrieben, mit drei Drop-Down-Menüs und einem Freifeld versehen. Das obere Drop-Down-Menü “Zielobjekt” wie auch das letzte  Drop-Down-Menü “Bezugsobjekt” machen eine Datenbankabfrage zur “odm_public.berlin.geoobjects”-Tabelle und listen die Namen der jeweiligen Einträge, beschränkt auf die ersten 100 auf.
+Der Nutzer des Editors kann durch Auswahl der drei Attribute (Geoobjekt, Beziehung und Bezug) eine Aussage über ein bestimmtes Zielobjekt bestimmen. Diese Aussage wird mit den drei Objekte in einer JSON-Datei gespeichert. 
+
+Das JSON-Objekt sieht wie folgt aus:
+
+Aufbau: {
+		“Subjekt”: “LinkAusDatenbank”,
+		“Prädikat”: AuswahlAusListe”,
+		“Objekt”: “BezugZumSubjekt”
+	 	}
+
+Als nächsten Schritt war die Überlegung, ob es weitere standardisierte Formate wie XML und/oder CSV geben soll. Der Nutzer des Interfaces soll durch Auswahlmöglichkeit entscheiden welches Format bevorzugt wird.
