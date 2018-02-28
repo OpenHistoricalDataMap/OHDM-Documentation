@@ -130,14 +130,35 @@ wie sie installiert wird und wie man sie startet.\\
 Das LOD-Server kann lokal durch die Kommandozeile mit folgenden Befehle aus 
 dem Root-Verzeichnis des Projektes gestartet werden:\\
 \\
-Windows:
+Windows (mit cmd.exe):
 \begin{lstlisting}
 mvnw.cmd spring-boot:run
 \end{lstlisting}
 Linux und macOS:
 \begin{lstlisting}
-mvnw spring-boot:run
+mvn spring-boot:run
 \end{lstlisting}
+\vspace{5mm}
+\noindent
+Um die Anwendung auf ein Webserver zu installieren, muss man zuerst eine WAR-Datei 
+(Web Application Resource) erzeugen. Dafur stehen folgene befehle zur Verfügung: \\
+\\
+Windows (mit cmd.exe):
+\begin{lstlisting}
+mvnw.cmd package
+\end{lstlisting}
+\vspace{5mm}
+\noindent
+Linux und macOS:
+\begin{lstlisting}
+mvn package
+\end{lstlisting}
+\vspace{5mm}
+\noindent
+Nach dem Ausführen des Befehls wird eine WAR-Datei im Ordner \textbf{target} 
+des Root-Verzeichnises erstellt. Diese Datei kann dann auf ein Tomcat-Webserver
+hochgeladen werden.
+
 
 \section{Qualitätssicherung}
 (Ausfüllen ab Alpha-Phase).
