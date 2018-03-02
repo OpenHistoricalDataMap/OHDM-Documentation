@@ -124,9 +124,6 @@ spring.jpa.properties.hibernate.default_schema = ohdm
 \end{lstlisting}
 
 \subsection{Deployment / Runtime}
-Beschreibung wie die Komponenten aus dem Quellcode erzeugt werden kann,
-wie sie installiert wird und wie man sie startet.\\
-\\
 Das LOD-Server kann lokal durch die Kommandozeile mit folgenden Befehle aus 
 dem Root-Verzeichnis des Projektes gestartet werden:\\
 \\
@@ -138,16 +135,17 @@ Linux und macOS:
 \begin{lstlisting}
 mvn spring-boot:run
 \end{lstlisting}
-\vspace{5mm}
-\noindent
+Das lokale Server wird dann über die URL \textbf{127.0.0.1:8080} 
+(oder localhost:8080) verfügbar.\\
+\\
 Um die Anwendung auf ein Webserver zu installieren, muss man zuerst eine WAR-Datei 
-(Web Application Resource) erzeugen. Dafur stehen folgene befehle zur Verfügung: \\
+(Web Application Resource) erzeugen. Dafur stehen folgene Befehle zur Verfügung: \\
 \\
 Windows (mit cmd.exe):
 \begin{lstlisting}
 mvnw.cmd package
 \end{lstlisting}
-\vspace{5mm}
+\vspace{10mm}
 \noindent
 Linux und macOS:
 \begin{lstlisting}
@@ -157,7 +155,7 @@ mvn package
 \noindent
 Nach dem Ausführen des Befehls wird eine WAR-Datei im Ordner \textbf{target} 
 des Root-Verzeichnises erstellt. Diese Datei kann dann auf ein Tomcat-Webserver
-hochgeladen werden.
+hochgeladen und ausgeführt werden.
 
 
 \section{Qualitätssicherung}
