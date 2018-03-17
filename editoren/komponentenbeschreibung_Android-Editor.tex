@@ -1,0 +1,82 @@
+\usepackage{url}
+\section{Dokumentengeschichte}
+\begin{table}[h]
+ \begin{tabular}{|l|l|p{4cm}|}
+ \hline
+ Zeitraum & PL/Autor(en) & Änderungen \\
+ \hline
+ Wintersemester 2017/2018 & Justin Sprenger & 
+text \newline 
+text \newline 
+text \newline 
+text \newline 
+text \newline 
+text \newline 
+ 
+  \\
+ \hline
+ \end{tabular}
+ \caption{Dokumentengeschichte}
+ \end{table}
+
+\section{Aufgabe der Komponente}
+Verbale kurze prägnante Beschreibung, was die Komponente leisten soll.
+Das sind wenige Seiten.
+
+(Ausfüllen in Prototyp-Phase)
+
+Der Editor liefert dem Nutzer eine Ansicht der OHDM Karte. Hier hat der Nutzer die Möglichkeit eine Strecke oder ein Gebiet aufzuzeichnen und abzuspeichern. Des weiteren soll ein Zeitstempel und ein Name angegeben werden können um Historische Orte zu bestimmen.
+
+\section{Architektur}
+
+\subsection{Überlick}
+Grafik der Teile der Komponente (wichtig: Benennung aller Schnittstellen). 
+Anwendung der Komponente nennen (Use Case).
+
+Übliche Interaktionen durch Interaktionsdiagramme.
+
+(Ausfüllen in Prototyp-Phase)
+
+Der Editor bietet keine Schnittstellen nach außen. Jedoch soll die Import Schnittstelle verwendet werden um die Aufgezeichneten Daten der OHDM Datenbank hinzuzufügen.
+
+\subsection{Schnittstellendefinitionen}
+
+Keine Schnittstellen nach außen.
+
+\subsection{genutztes Komponenten}
+Beschreibung, welche weiteren Komponenten (in welchen Versionen, wo beziehbar) genutzt werden.
+
+(Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
+
+Momentan wird die OSMdroid-Api verwendet um die OHDM-Karte darzustellen.
+
+\section{Nutzung}
+\subsection{Code}
+Der Code befindet sich auf GitHub. \url{https://github.com/OpenHistoricalDataMap/OHDMAndroidEditor/}
+Die verwendete IDE ist Android Studio.
+
+\subsection{Deployment / Runtime}
+Mittels der IDE Android Studio kann die App in einem Emulator gestartet oder direkt auf ein Device installiert werden.
+
+\section{Qualitätssicherung}
+
+App ist noch Sehr fehleranfällig, stürzte häufig ab, seit dem der stacked Layer eingefügt wurde stürzt die app kaum noch ab.
+Großteil der Fehler die Auftreten können werden abgefangen.
+
+
+\subsection{Test}
+Wie wird die Komponente getestet.
+
+Getestet wir die Software durch manuell simulierte GPS Daten, und durch real abgelaufene strecken.
+
+\section{Vorschläge / Ausblick}
+Was ist aufgefallen, was sollte man ändern? Löschen Sie auch gern die Kommentare
+der Vorgänger, aber nur, wenn es wirklich nicht mehr relevant ist.
+
+Anfänglich gab es Probleme mit den Layern, jedoch wurde Dieses Problem durch den Stacked Layer(Multilayer) gelöst. wenn zu viele Layer geladen werden müssen kann es passieren, das die APP abstürzt. Durch den Stacked Layer lädt die MAP außerdem schneller.
+
+Die aufgezeichneten Strecken sind sehr genau und es treten viele kleine Abweichungen auf.
+
+Bisher ist noch nicht die Import-Schnittstelle eingebunden, das heißt die Daten werden bisher nicht in die Datenbank übernommen aber schon ins GeoJSON-Format umgewandelt.
+
+
