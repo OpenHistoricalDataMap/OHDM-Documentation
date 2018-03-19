@@ -1,4 +1,5 @@
 \usepackage{url}
+\usepackage{graphicx}
 \section{Dokumentengeschichte}
 \begin{table}[h]
  \begin{tabular}{|l|l|p{4cm}|}
@@ -6,7 +7,7 @@
  Zeitraum & PL/Autor(en) & Änderungen \\
  \hline
  Wintersemester 2017/2018 & Justin Sprenger (s0556255) & 
-text \newline 
+Android-Editor Dokumentation erstellt \newline 
 text \newline 
 text \newline 
 text \newline 
@@ -23,15 +24,16 @@ text \newline
 Verbale kurze prägnante Beschreibung, was die Komponente leisten soll.
 Das sind wenige Seiten.
 
-(Ausfüllen in Prototyp-Phase)
+(Ausfüllen in Prototyp-Phase) 
+
 
 Der Android-Editor soll dem Nutzer die Möglichkeit bieten alte historische Orte aufzuzeichnen. Die App soll die von dem Nutzer abgelaufenen Strecken/Gebite aufzeichnen und abspeichern. Die aufgezeichneten Daten sollen als GeoJSON gespeichert werden und anschließend in die Datenbank eingefügt werden, damit diese anschließend für jeden und nicht nur auf dem lokalem Gerät sichtbar sind. Die gespeicherten Daten sollen des weiteren Mit Namen und Zeitstempel versehen werden.
 
-\includegraphics[width=0.45\textwidth]{AndroidEditorOV}
+\includegraphics[width=0.7\textwidth]{AndroidEditorOV}
 
 \section{Architektur}
 
-\subsection{Überlick}
+\subsection{Überblick}
 Grafik der Teile der Komponente (wichtig: Benennung aller Schnittstellen). 
 Anwendung der Komponente nennen (Use Case).
 
@@ -39,7 +41,7 @@ Anwendung der Komponente nennen (Use Case).
 
 (Ausfüllen in Prototyp-Phase)
 
-\includegraphics[width=0.45\textwidth]{UseCase}
+\includegraphics[width=1.0\textwidth]{UseCase}
 
 Der Editor bietet keine Schnittstellen nach außen. Jedoch soll die Import Schnittstelle verwendet werden um die Aufgezeichneten Daten der OHDM Datenbank hinzuzufügen.
 
@@ -87,4 +89,4 @@ Die aufgezeichneten Strecken sind sehr genau und es treten viele kleine Abweichu
 
 Bisher ist noch nicht die Import-Schnittstelle eingebunden, das heißt die Daten werden bisher nicht in die Datenbank übernommen, jedoch schon ins GeoJSON-Format umgewandelt und testweise auf dem Display mit ausgegeben.
 
-\includegraphics[width=0.45\textwidth]{AndroidEditorJSON}
+\includegraphics[width=0.7\textwidth]{AndroidEditorJSON}
