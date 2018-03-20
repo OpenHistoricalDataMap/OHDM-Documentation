@@ -27,7 +27,7 @@ Das sind wenige Seiten.
 (Ausfüllen in Prototyp-Phase) 
 
 
-Der Android-Editor soll dem Nutzer die Möglichkeit bieten alte historische Orte aufzuzeichnen. Die App soll die von dem Nutzer abgelaufenen Strecken/Gebite aufzeichnen und abspeichern. Die aufgezeichneten Daten sollen als GeoJSON gespeichert werden und anschließend in die Datenbank eingefügt werden, damit diese anschließend für jeden und nicht nur auf dem lokalem Gerät sichtbar sind. Die gespeicherten Daten sollen des weiteren Mit Namen und Zeitstempel versehen werden.
+Der Android-Editor soll dem Nutzer die Möglichkeit bieten alte historische Orte aufzuzeichnen. Die App soll die von dem Nutzer abgelaufenen Strecken/Gebiete aufzeichnen und abspeichern. Die aufgezeichneten Daten sollen als GeoJSON gespeichert und anschließend in die Datenbank eingefügt werden, damit diese für jeden und nicht nur auf dem lokalem Gerät sichtbar sind. Die gespeicherten Daten werden mit Namen und Zeitstempel versehen.
 
 \includegraphics[width=0.7\textwidth]{AndroidEditorOV}
 
@@ -47,7 +47,7 @@ Der Editor bietet keine Schnittstellen nach außen. Jedoch soll die Import Schni
 
 Der Editor lädt sich die Layer, welche für die OHDM Map benötigt werden, von dem Geo-Server und erzeugt mithilfe der OSMdroid-Api eine Karte auf dem Smartphone. Der Nutzer hat die Möglichkeit eine Strecke oder ein Gebiet aufzuzeichnen und abzuspeichern. Des weiteren soll ein Zeitstempel und ein Name angegeben werden können um Historische Orte zu dokumentieren.
 
-Die aufgezeichnete Strecke wird auf der Karte als Rote Linie Dargestellt, welche sich kontinuierlich wärend der aufzeichnungs-Phase verändert. Der Nutzer hat anschließend die Möglichkeit anzugeben um was es sich handelt (Gebiet,Punkt,Strecke). Die aufgezeichneten Datene werden als GeoJSOn zwischengespeichert und sollen anschließend an die Import-Schnitstelle übertragen werden.
+Die aufgezeichnete Strecke wird auf der Karte als Rote Linie Dargestellt, welche sich kontinuierlich während der aufzeichnungs-Phase verändert. Der Nutzer hat anschließend die Möglichkeit anzugeben um was es sich handelt (Gebiet,Punkt,Strecke). Die aufgezeichneten Daten werden als GeoJSON zwischengespeichert und sollen anschließend an die Import-Schnittelle übertragen werden.
 
 \subsection{Schnittstellendefinitionen}
 
@@ -83,10 +83,10 @@ Getestet wir die Software durch manuell simulierte GPS Daten, und durch real abg
 Was ist aufgefallen, was sollte man ändern? Löschen Sie auch gern die Kommentare
 der Vorgänger, aber nur, wenn es wirklich nicht mehr relevant ist.
 
-Anfänglich gab es Probleme mit dem Laden der Layern. Die Ladezeit hatte für ein Gebit fast 5 Minuten gedauert und es kam zu vielen Exceptions. Die Exceptions traten auf da für einige Koordinaten keine Layerdaten/Bilddaten existierten(vermutlich zu genaue Koordinaten). Durch den StackedLayer(Multilayer) wurde dieses Problem gelöst. Die Ladezeit ist nun annehmbar(ca 1 Minute) und es treten kaum bis keine Exceptions auf.
+Anfänglich gab es Probleme mit dem Laden der Layer. Die Ladezeit hatte für ein Gebiet fast 5 Minuten gedauert und es kam zu vielen Exceptions. Die Exceptions traten auf da für einige Koordinaten keine Layerdaten/Bilddaten existierten(vermutlich zu genaue Koordinaten). Durch den StackedLayer(Multilayer) wurde dieses Problem gelöst. Die Ladezeit ist nun annehmbar(ca 1 Minute) und es treten kaum bis keine Exceptions mehr auf.
 
 Die aufgezeichneten Strecken sind sehr genau und es treten viele kleine Abweichungen auf. Aus diesem Grund wurde wurde eine Abweichungsbegrenzung von 1 Meter gesetzt. Alle Koordinaten welche eine Abweichung von weniger als 1 Meter von den vorher aufgezeichneten Koordinaten haben werden ignoriert und nicht aufgezeichnet.
 
-Bisher ist noch nicht die Import-Schnittstelle eingebunden, das heißt die Daten werden bisher nicht in die Datenbank übernommen, jedoch schon ins GeoJSON-Format umgewandelt und testweise auf dem Display mit ausgegeben.
+Bisher ist noch nicht die Import-Schnittstelle eingebunden, das heißt die Daten werden bisher nicht in der Datenbank aufgenommen, jedoch schon ins GeoJSON-Format umgewandelt und testweise auf dem Display mit ausgegeben.
 
 \includegraphics[width=0.7\textwidth]{AndroidEditorJSON}
