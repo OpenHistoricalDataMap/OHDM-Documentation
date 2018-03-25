@@ -1,21 +1,13 @@
+\usepackage{url}
+\usepackage{graphicx}
 \section{Dokumentengeschichte}
 \begin{table}[h]
  \begin{tabular}{|l|l|p{4cm}|}
  \hline
  Zeitraum & PL/Autor(en) & Änderungen \\
  \hline
- Sommersemester 1980 & IHR NAME & 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
- 
-  \\
- \hline
- Wintersemester 1980/81 & IHR NAME & 
-text \newline 
+ Wintersemester 2017/2018 & Justin Sprenger (s0556255) & 
+Android-Editor Dokumentation erstellt \newline 
 text \newline 
 text \newline 
 text \newline 
@@ -32,11 +24,16 @@ text \newline
 Verbale kurze prägnante Beschreibung, was die Komponente leisten soll.
 Das sind wenige Seiten.
 
-(Ausfüllen in Prototyp-Phase)
+(Ausfüllen in Prototyp-Phase) 
+
+
+Der Android-Editor soll dem Nutzer die Möglichkeit bieten alte historische Orte aufzuzeichnen. Die App soll die von dem Nutzer abgelaufenen Strecken/Gebiete aufzeichnen und abspeichern. Die aufgezeichneten Daten sollen als GeoJSON gespeichert und anschließend in die Datenbank eingefügt werden, damit diese für jeden und nicht nur auf dem lokalem Gerät sichtbar sind. Die gespeicherten Daten werden mit Namen und Zeitstempel versehen.
+
+\includegraphics[width=0.7\textwidth]{AndroidEditorOV}
 
 \section{Architektur}
 
-\subsection{Überlick}
+\subsection{Überblick}
 Grafik der Teile der Komponente (wichtig: Benennung aller Schnittstellen). 
 Anwendung der Komponente nennen (Use Case).
 
@@ -44,40 +41,78 @@ Anwendung der Komponente nennen (Use Case).
 
 (Ausfüllen in Prototyp-Phase)
 
-\subsection{Schnittstellendefinitionen}
-Beschreibung der angebotenen Schnittstellen. Benennung der Funktionen
-mit Vor- und Nachbedingungen. Beschreibuung des Protocol-Bindings.
+\includegraphics[width=1.0\textwidth]{UseCase}
+\includegraphics[width=0.7\textwidth]{OOA}
 
-(Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
+Der Editor bietet keine Schnittstellen nach außen. Jedoch soll die Import Schnittstelle verwendet werden um die Aufgezeichneten Daten der OHDM Datenbank hinzuzufügen.
+
+Der Editor lädt sich die Layer, welche für die OHDM Map benötigt werden, von dem Geo-Server und erzeugt mithilfe der OSMdroid-Api eine Karte auf dem Smartphone. Der Nutzer hat die Möglichkeit eine Strecke oder ein Gebiet aufzuzeichnen und abzuspeichern. Des weiteren soll ein Zeitstempel und ein Name angegeben werden können um Historische Orte zu dokumentieren.
+
+Die aufgezeichnete Strecke wird auf der Karte als Rote Linie Dargestellt, welche sich kontinuierlich während der aufzeichnungs-Phase verändert. Der Nutzer hat anschließend die Möglichkeit anzugeben um was es sich handelt (Gebiet,Punkt,Strecke). Die aufgezeichneten Daten werden als GeoJSON zwischengespeichert und sollen anschließend an die Import-Schnittelle übertragen werden.
+
+\subsection{Schnittstellendefinitionen}
+
+Diese Anwendung bietet keine Schnittstellen nach außen.
 
 \subsection{genutztes Komponenten}
 Beschreibung, welche weiteren Komponenten (in welchen Versionen, wo beziehbar) genutzt werden.
 
 (Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
 
+Momentan wird die OSMdroid-Api verwendet um die OHDM-Karte darzustellen.
+Die App soll in einer Späteren Version die Import-Schnittstelle verwenden um die aufgezeichneten Daten(Koordinaten) zu übertragen.
+
+\begin{table}[h]
+ \begin{tabular}{|l|l|p{4cm}|}
+ \hline
+ API & Komponente & Kurzbeschreibung \\
+ \hline
+osmdroid & OnlineTileSourceBase & Dient dem generieren der URL, um Layer vom WMS-Server zu laden \newline 
+ \\
+ \hline
+osmdroid & GeoPoint & Datenformat für Punkte(Koordinaten) \newline 
+ \\
+ \hline
+osmdroid & MapController & dient dem verändern von Werten auf welche die MapView zurückgreift \newline 
+ \\
+ \hline
+osmdroid & MapView & Darstellung der Karte \newline 
+ \\
+ \hline
+osmdroid & Polyline & Dient zur Darstellung einer Linie auf der Karte \newline 
+ \\
+ \hline
+ \end{tabular}
+ \caption{Methodenbeschreibung}
+ \end{table}
+
+
 \section{Nutzung}
 \subsection{Code}
-Wo findet man den Code. Struktur des Codes. (In Prototyphase ausfüllen,
-kann dort sehr kurz sein. Ab Alpha-Phase konkret beschreiben.)
+Der Code befindet sich auf GitHub. \url{https://github.com/OpenHistoricalDataMap/OHDMAndroidEditor/}
+Die verwendete IDE ist Android Studio.
 
 \subsection{Deployment / Runtime}
-Beschreibung wie die Komponenten aus dem Quellcode erzeugt werden kann,
-wie sie installiert wird und wie man sie startet.
+Mittels der IDE Android Studio kann die App in einem Emulator gestartet oder direkt auf ein Device installiert werden.
 
 \section{Qualitätssicherung}
-(Ausfüllen ab Alpha-Phase).
 
-Wie erfolgt die Sicherung der Qualität? Keine Romane, sondern ehrlich notieren,
-was man tut. Wenn man nichts tut, dann steht hier: Wir sichern die Qualität der
-Komponente nicht.
-
-Issue-Tracking: wie erfolgt das, interne Fehlermeldungen (ab Alpha), 
-externe Fehlermeldungen ab Beta.
+App ist noch Sehr fehleranfällig, stürzte häufig ab, seit dem der stacked Layer eingefügt wurde stürzt die app kaum noch ab. Der Editor ist Momentan noch ein Prototyp.
+Großteil der Fehler die Auftreten können werden abgefangen.
 
 \subsection{Test}
 Wie wird die Komponente getestet.
+
+Getestet wir die Software durch manuell simulierte GPS Daten, und durch real abgelaufene strecken.
 
 \section{Vorschläge / Ausblick}
 Was ist aufgefallen, was sollte man ändern? Löschen Sie auch gern die Kommentare
 der Vorgänger, aber nur, wenn es wirklich nicht mehr relevant ist.
 
+Anfänglich gab es Probleme mit dem Laden der Layer. Die Ladezeit hatte für ein Gebiet fast 5 Minuten gedauert und es kam zu vielen Exceptions. Die Exceptions traten auf da für einige Koordinaten keine Layerdaten/Bilddaten existierten(vermutlich zu genaue Koordinaten). Durch den StackedLayer(Multilayer) wurde dieses Problem gelöst. Die Ladezeit ist nun annehmbar(ca 1 Minute) und es treten kaum bis keine Exceptions mehr auf.
+
+Die aufgezeichneten Strecken sind sehr genau und es treten viele kleine Abweichungen auf. Aus diesem Grund wurde wurde eine Abweichungsbegrenzung von 1 Meter gesetzt. Alle Koordinaten welche eine Abweichung von weniger als 1 Meter von den vorher aufgezeichneten Koordinaten haben werden ignoriert und nicht aufgezeichnet.
+
+Bisher ist noch nicht die Import-Schnittstelle eingebunden, das heißt die Daten werden bisher nicht in der Datenbank aufgenommen, jedoch schon ins GeoJSON-Format umgewandelt und testweise auf dem Display mit ausgegeben.
+
+\includegraphics[width=0.7\textwidth]{AndroidEditorJSON}

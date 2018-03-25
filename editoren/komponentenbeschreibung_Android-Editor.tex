@@ -42,6 +42,7 @@ Anwendung der Komponente nennen (Use Case).
 (Ausfüllen in Prototyp-Phase)
 
 \includegraphics[width=1.0\textwidth]{UseCase}
+\includegraphics[width=0.7\textwidth]{OOA}
 
 Der Editor bietet keine Schnittstellen nach außen. Jedoch soll die Import Schnittstelle verwendet werden um die Aufgezeichneten Daten der OHDM Datenbank hinzuzufügen.
 
@@ -60,6 +61,31 @@ Beschreibung, welche weiteren Komponenten (in welchen Versionen, wo beziehbar) g
 
 Momentan wird die OSMdroid-Api verwendet um die OHDM-Karte darzustellen.
 Die App soll in einer Späteren Version die Import-Schnittstelle verwenden um die aufgezeichneten Daten(Koordinaten) zu übertragen.
+
+\begin{table}[h]
+ \begin{tabular}{|l|l|p{4cm}|}
+ \hline
+ API & Komponente & Kurzbeschreibung \\
+ \hline
+osmdroid & OnlineTileSourceBase & Dient dem generieren der URL, um Layer vom WMS-Server zu laden \newline 
+ \\
+ \hline
+osmdroid & GeoPoint & Datenformat für Punkte(Koordinaten) \newline 
+ \\
+ \hline
+osmdroid & MapController & dient dem verändern von Werten auf welche die MapView zurückgreift \newline 
+ \\
+ \hline
+osmdroid & MapView & Darstellung der Karte \newline 
+ \\
+ \hline
+osmdroid & Polyline & Dient zur Darstellung einer Linie auf der Karte \newline 
+ \\
+ \hline
+ \end{tabular}
+ \caption{Methodenbeschreibung}
+ \end{table}
+
 
 \section{Nutzung}
 \subsection{Code}
