@@ -4,24 +4,15 @@
  \hline
  Zeitraum & PL/Autor(en) & Änderungen \\
  \hline
- Sommersemester 1980 & IHR NAME & 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
+ Sommersemester 2017/18 & Khaled Halabieh 556290  & 
+Imports
  
   \\
  \hline
- Wintersemester 1980/81 & IHR NAME & 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
-text \newline 
- 
+ Wintersemester 2017/18 & Nabeel Smadi 556209 & 
+Imports
+
+
   \\
  \hline
  \end{tabular}
@@ -29,55 +20,42 @@ text \newline
  \end{table}
 
 \section{Aufgabe der Komponente}
-Verbale kurze prägnante Beschreibung, was die Komponente leisten soll.
-Das sind wenige Seiten.
 
-(Ausfüllen in Prototyp-Phase)
+Imports ist eine Webschnittstelle die zum Einbringen von Geometrien und historische Daten in das System dient.
+Die Webschnittstelle nimmt durch post request Geojason und speichert die Daten auf PostGIS Datenbank als Geometrie.
 
 \section{Architektur}
 
 \subsection{Überlick}
-Grafik der Teile der Komponente (wichtig: Benennung aller Schnittstellen). 
-Anwendung der Komponente nennen (Use Case).
 
-Übliche Interaktionen durch Interaktionsdiagramme.
 
-(Ausfüllen in Prototyp-Phase)
+\begin{figure}[h]
+\centering
+\includegraphics[page=1, width=127mm]{importer2/pic/UmlImporter.png}
+\caption{UML Diagramm}
+\label{fig:UmlImporter}
+\end{figure}
+%TODO Text zum Bild :)
+
+
 
 \subsection{Schnittstellendefinitionen}
-Beschreibung der angebotenen Schnittstellen. Benennung der Funktionen
-mit Vor- und Nachbedingungen. Beschreibuung des Protocol-Bindings.
 
-(Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
-
+Das Projekt besteht auf eine Web Schnittstelle als Java Servlet die mit Rest Methoden arbeitet.
 \subsection{genutztes Komponenten}
-Beschreibung, welche weiteren Komponenten (in welchen Versionen, wo beziehbar) genutzt werden.
 
-(Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
-
+Das Projekt benutzt keine weitere Konponenten.
 \section{Nutzung}
 \subsection{Code}
-Wo findet man den Code. Struktur des Codes. (In Prototyphase ausfüllen,
-kann dort sehr kurz sein. Ab Alpha-Phase konkret beschreiben.)
+Der Code befindet sich im Importer Repository.
+
 
 \subsection{Deployment / Runtime}
-Beschreibung wie die Komponenten aus dem Quellcode erzeugt werden kann,
-wie sie installiert wird und wie man sie startet.
+Nach Compeilen wird ein WAR Datei erzeugt, diese WAR Datei wird durch Deployment auf GlassFish Server eingesetzt.
 
 \section{Qualitätssicherung}
-(Ausfüllen ab Alpha-Phase).
+Das Projekt macht keine Validierung von Gson Datei, falls der Import nicht erfolgreich abgelaufen ist, wird ein Fehler Meldung angezeigt.
 
-Wie erfolgt die Sicherung der Qualität? Keine Romane, sondern ehrlich notieren,
-was man tut. Wenn man nichts tut, dann steht hier: Wir sichern die Qualität der
-Komponente nicht.
-
-Issue-Tracking: wie erfolgt das, interne Fehlermeldungen (ab Alpha), 
-externe Fehlermeldungen ab Beta.
-
-\subsection{Test}
-Wie wird die Komponente getestet.
 
 \section{Vorschläge / Ausblick}
-Was ist aufgefallen, was sollte man ändern? Löschen Sie auch gern die Kommentare
-der Vorgänger, aber nur, wenn es wirklich nicht mehr relevant ist.
-
+Es fehlt noch die Validierung von JSON Datei, die den Nutzer zeigt, wo genau die Fehler liegen.
