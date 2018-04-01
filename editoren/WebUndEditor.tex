@@ -1,0 +1,132 @@
+\documentclass[a4paper, 12.5pt]{scrartcl}
+\usepackage{graphicx}
+\usepackage{url}
+\begin{document}
+\section{Dokumentengeschichte}
+\begin{table}[h]
+    \begin{tabular}{|l|l|p{4cm}|}
+        \hline
+        Zeitraum & PL/Autor(en) & Änderungen \\
+        \hline
+        Wintersemester 2017/2018 & Samuel Erb (s0556350) &
+        Web-Editor Dokumentation erstellt \newline
+
+        \\
+        \hline
+    \end{tabular}
+    \caption{Dokumentengeschichte}
+\end{table}
+
+\section{Aufgabe der Komponente}
+Verbale kurze prägnante Beschreibung, was die Komponente leisten soll.
+Das sind wenige Seiten.
+
+(Ausfüllen in Prototyp-Phase)
+
+Der Web-Editor soll dem Nutzer die Möglichkeit bieten alte historische Karten, die schon digitalisiert wurden und als Bilddatei vorliegen, in das OHDM-Projekt einzupflegen. Die aufgezeichneten Daten sollen als GeoJSON gespeichert und anschließend per API-Schnittstelle in die Datenbank eingefügt werden.
+
+
+\section{Architektur}
+
+\subsection{Überblick}
+Grafik der Teile der Komponente (wichtig: Benennung aller Schnittstellen).
+Anwendung der Komponente nennen (Use Case).
+
+Übliche Interaktionen durch Interaktionsdiagramme.
+
+(Ausfüllen in Prototyp-Phase)
+
+
+Der Editor bietet eine Schnittstelle nach außen, mit der er die aufgezeichneten Daten an den Server schickt.
+
+Der Editor lädt sich die Layer, welche für die OHDM Map benötigt werden, von dem Geo-Server und erzeugt mithilfe der OSMdroid-Api eine Karte auf dem Smartphone. Der Nutzer hat die Möglichkeit eine Strecke oder ein Gebiet aufzuzeichnen und abzuspeichern. Des weiteren soll ein Zeitstempel und ein Name angegeben werden können um Historische Orte zu dokumentieren.
+
+Die aufgezeichnete Strecke wird auf der Karte als Rote Linie Dargestellt, welche sich kontinuierlich während der aufzeichnungs-Phase verändert. Der Nutzer hat anschließend die Möglichkeit anzugeben um was es sich handelt (Gebiet,Punkt,Strecke). Die aufgezeichneten Daten werden als GeoJSON zwischengespeichert und sollen anschließend an die Import-Schnittelle übertragen werden.
+
+\subsection{Schnittstellendefinitionen}
+
+Per "Post"-Methode werden GeoJSON-Daten an den Server gesendet
+
+\subsection{genutztes Komponenten}
+Beschreibung, welche weiteren Komponenten (in welchen Versionen, wo beziehbar) genutzt werden.
+
+(Beginnen in Prototyp-Phase. Konkretisieren in der Alphaphase)
+
+Momentan wird die Openlayers's-API verwendet um die OHDM-Karte darzustellen.
+Außerdem werden die jQuery und Bootstrap Bibiliotheken verwendent.
+
+\begin{table}[h]
+    \begin{tabular}{|l|l|p{4cm}|}
+        \hline
+        API & Komponente & Kurzbeschreibung \\
+        \hline
+        Openlayer's & viele & "OpenLayers makes it easy to put a dynamic map in any web page. It can display map tiles, vector data and markers loaded from any source. OpenLayers has been developed to further the use of geographic information of all kinds. It is completely free, Open Source JavaScript, released under the 2-clause BSD License (also known as the FreeBSD)." - openlayers.org\newline
+        \\
+        \hline
+        jQuery & viele & "jQuery is a fast, small, and feature-rich JavaScript library. It makes things like HTML document traversal and manipulation, event handling, animation, and Ajax much simpler with an easy-to-use API that works across a multitude of browsers. With a combination of versatility and extensibility, jQuery has changed the way that millions of people write JavaScript." - jQuery.com\newline
+        \\
+        \hline
+        Bootstrap & viele & liefert eine Vielzahl an CSS-Selektoren um Websiten zu designen \newline
+        \\
+        \hline
+    \end{tabular}
+    \caption{Methodenbeschreibung}
+\end{table}
+
+
+\section{Nutzung}
+\subsection{Code}
+Der Code befindet sich auf GitHub. \url{https://github.com/OpenHistoricalDataMap/WebUndEditor}
+Die verwendete IDE ist PhpStorm.
+
+\subsection{Deployment / Runtime}
+Siehe README.md im Github.
+
+\section{Qualitätssicherung}
+
+Der Editor hat noch einen schwerwiegenden Fehler. Der im Code naeher beschrieben ist
+
+\subsection{Test}
+Wie wird die Komponente getestet.
+
+Diese Komponenten wird durch Menschenhand getestet.
+
+\section{Funktionsbeschreibung}
+
+Um die Übersicht des Codes zu verbessern wurde er in mehrere „Activities“ geteilt:
+
+\subsection{image\_upload\_activity}
+Hier wird unter Verwendung von $<input\ type=“file“>$ aus dem hoch geladenem Bild ein HTML Objekt mit dem Tag „img“ erstellt.
+Anschließend wird das Objekt an die nächste Activity weitergegeben: $adjust\_activity$
+
+\subsection{adjust\_activity}
+Hier wird eine neue „ol.layer“ erstellt, diese enthält ein Objekt der Klasse $ol.source$. Das Objekt der Klasse $ol.source$ dient in diesem Fall als Container fuer ein Feature ($ol.feature$).
+Ein Feature kann ein $Point$, $LineString$ oder $Polygon$ sein.
+Um nun ein Bild auf der Karte anzuzeigen benutze ich als Geometrie einen Punkt, dem ich das Bild als Style-Objekt (ol.style.Icon)zugewiesen habe.
+
+Um das Feature (der Punkt samt seinem Bild als Style) wurden die Interactions Select und Translate ($ol.interaction.Select$, $ol.interaction.Translate$) zur Karte hinzugefuegt.
+
+Falls in die Karte hineingezoomt wird sollte das Bild im selben Verhältnis bleiben. Das war ganz schön tricky da die Zoomstufe der Karte ($map.getView().getResolution()$)von annähernd 0 bis zu einer hohen positiven Zahl wobei kleine Zahlen nah an der Erde und hohe Zahlen weiter weg sind. Bei der Zoomstufe des Bildes ($style.getImage().getScale()$) ist es andersrum.
+
+Um trotzdem das ungefähr selbe Verhältnis beizubehalten(bei mehrmaligen raus und reinzoomen sieht man das es verändert), wurde die initiale Zoomstufe der Karte erfasst. Diese wird beim zoomen dazu verwendet die Differenz der Zoomstufe zu bestimmten. Dieser Wert wird mit dem Verhältnis (Kartenzoom / Bildzoom) multipliziert. Dieser Wert wiederum mit dem Bildzoom addiert und das Ergebniss als neuer Bildzoom festgelegt. (siehe $adjust\_activity.js$ Line 47-53).
+
+\subsection{draw\_activity}
+Ist nun ein Bild in der Karte vorhanden kann man damit beginnen Geometrien einzuzeichnen.
+Dazu wird eine Layer ($ol.layer$) erzeugt, die die eingezeichneten Geometrien aufnehmen soll. In der Theorie werden diese aber in eine Source ($ol.source$) gemalt, die der Layer als Datenhaltung dient. Die Geometrien werden per Draw-Interaction ($ol.interaction.Draw$) in der Source sowie der Collection ($ol.collection$) gespeichert. Die Collection dient später zum auslesen der Daten. Per $setProperties()$ werden Attribute zu den gezeichneten Geometrien -> Features hinzugeguegt.
+
+\subsection{geometry\_upload\_activity}
+Hier werden die Daten gesammelt und entweder an die Import-Schnittstelle per AJAX-Post gesendet oder per Button heruntergeladen.
+
+
+\section{Vorschläge / Ausblick}
+\subsection{Eingabeueberpruefung}
+Man sollte die Daten aus den Textfeldern auf Code ueberpruefen und ggf. Escape-Characters einsetzen. Um SQL-Injection und Cross-Site-Scripting zu verhindern.
+\subsection{Automatische Kartenanpassung}
+Es waere schoen wenn man auf dem Bild zunaechst 2 Punkte, anschliessend auf der Karte 2. Wenn das Bild nun auf der Karte angezeigt wird werden diese Punkte uebereinander gelegt und das Bild skaliert.
+\subsection{Drag and Drop Importer}
+Drag'n'Drop-Importer fuer GeoJSON um vorher gespeicherte Daten wieder zu importieren und weiter zu bearbeiten. \url{https://openlayers.org/en/latest/examples/drag-and-drop.html}
+\subsection{Fehler mit dem Punkt beheben}
+Karte verschwindet sobald der Punkt, der mit dem Bild ueber das Feature verknuepft ist, aus dem Viewport ist.
+Vorschlag: Bild mit Polygon umranden und Bild als Feature fuers Polygon benutzen.
+
+\end{document}
