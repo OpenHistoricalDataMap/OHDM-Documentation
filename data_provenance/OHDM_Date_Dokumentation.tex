@@ -1,0 +1,124 @@
+\documentclass[]{article}
+\usepackage{textcomp}
+
+%opening
+\title{Ein kalenderunabhängiges Datumsformat (OHDM-Date)}
+\author{Kirill Mishin}
+
+\begin{document}
+\maketitle 
+
+\begin{center}
+	Sommersemester 2018
+\end{center}
+
+\section{Einführung}
+Im Gegensatz zu OSM (Open Street Map) werden in ODHM nicht nur aktuelle Karten sondern auch historische angeboten. Momentan werden die Daten im Datumsformat gespeichert. Es gibt nur ein Problem und zwar dass die Daten sich auf historische Ereignisse beziehen. Die Kalender haben sich während der Zeit verändert, zB. In Europa gab es über Jahrhunderte 2 Kalender: den julianischen und den gregorianischen. Der erste wurde nur zum Beginn des 20. Jahrhundert vollständig abgeschafft.
+
+
+\section{Problem}
+So stellt sich die Frage in welchem Format das Datum intern gespeichert werden soll, wenn man z.B. Datenimporte erhält die ein anderes Kalendersystem nutzen (z.B. Maya-Kalander).
+
+
+\section{Vorgehen}
+So stellt sich die Frage in welchem Format das Datum intern gespeichert werden soll, wenn man z.B. Datenimporte erhält die ein anderes Kalendersystem nutzen (z.B. Maya-Kalander).
+
+
+\section{Vorgehen}
+Die Idee war ein Datumformat zu schaffen, was ähnlich wie UNIX-Time wird. Dafür muss ein Tag festgelegt werden ab dem die Zahlung beginnen soll. In der Vorbereitungsphase wurde es entschlossen den Tag 11.12.2117 als "Startpunkt" zu nehmen, weil es an dem Tag Venustransit passiert. Ein Venustransit ist ein astronomiesches Erreignis wobei der Planet Venus vor der Sonne vorbeizieht. Da dieses Erreignis unabhängig von unserem Planeten ist und relativ selten stattfindet, kann der Tag 11.12.2117 als "Null"-Punkt in unserer Zahlung definiert werden. \newline
+
+Die Tageszählung erfolgt rückwerts so können wir sicher gehen, dass alle historischen Erreignise zeitlich bedeckt sind. Von der technischen Seite ist es auch kein Problem. Da Interger in Java den Max Wert von 2147483647 hat, ergeben sich daraus knapp 5883516 Jahre die man speichern kann. In unserem Fall recht dieser Wert vollkommend aus.
+
+
+\section{Implementierung}
+\subsection{Modellübersicht}
+Das Projekt besteht aus drei Klassen:
+\begin{itemize}
+	\item \textit{OhdmDateMain.java}
+	\item \textit{GregorCalender.java}
+	\item \textit{MayaCalender.java}
+	\newline
+\end{itemize}
+
+
+\textit{OhdmDateMain.java}-Klasse ist die Main-Klasse, dabei handelt es sich um eine Art "Oberfläche". Dem Nutzer werden 4 Interaktion angeboten:
+\begin{itemize}
+	\item (1) OHDM-Datum \textrightarrow Gregorianischen Kalender
+	\item (2) Gregorianischer Kalender \textrightarrow OHDM-Datum
+	\item (3) OHDM-Datum Maya \textrightarrow Kalender
+	\item (0) Abbrechen
+	\newline
+\end{itemize}
+
+\textit{GregorCalender.java}-Klasse beschreibt die Berechnungen zwischen gregorianischem Kalendersystem und dem OHDM-Format. Dadrin sind folgende Methoden definiert:
+\begin{itemize}
+	\item public String calculate() –  Berechnung des gregorianischen Datums aus dem OHDM-Format
+	\item private void jahrBerechnen() –  Berechnung des Jahres im gregorianischen Kalender aus dem OHDM-Format
+	\item private boolean schaltjahr(int jr) – Schaltjahrprüfung
+	\item private void monatBerechnen() –  Berechnung des Monats im gregorianischen Kalender aus dem OHDM-Format
+	\item private void tagBerechnen() –  Berechnung des Tages im gregorianischen Kalender aus dem OHDM-Format
+	\item public int fromGregorCalender(String datum) – Berechnung des OHDM-Datums aus dem gregorianischen Kalendersystem
+	\newline
+\end{itemize}
+
+
+\textit{MayaCalender.java}-Klasse definiert die Berechnungen aus dem gregorianischen Kalendersystem ins Mayakalendersystem. Dadrin sind folgende Methoden definiert:
+\begin{itemize}
+	\item public String inMayaCalender(int datumOHDM) –  Berechnung eines Datums ins Mayakalemdersystem aus dem OHDM-Format
+	\newline
+\end{itemize}
+
+
+\subsection{OHDM-Datum \textrightarrow Gregorianischen Kalender}
+Um das Datum ins gregorianischen Kalendersystem aus dem OHDM-Datum umzuwandeln muss man im Hauptmenü der Benutzeroberfläche "1" und das gewünschte Datum im OHDM Format eingeben. Dann wird ein Objekt der Klasse GregorCalender in der Klasse OhdmDateMain erstellt und das eingegebene Datum dem Konstruktor übergeben. Anschliessend wird das OHDM Datum im Objekt gespeichert. Als nächstes wird die Methode calculate() aufgerufen, die nach dem Vorgang ein String zurückgibt. Dieses String beinhält das Datum im gregorianischen Kalenderformat.
+
+In der Methode calculate() wird zuerst das gespeicherte OHDM Datum um 21 Tage erhöht. Das ist an der Stelle nötig um die Differenz im Dezember 2117 auszugleichen. Dann wird die Methode jahrBerechnen() ausgeführt. Hier werden nur die Jahre berücksichtigt. Die while Schleife wird solange wiederholt bis die OHDM-Datum-Variable kleiner als 365 ist. Mithilfe von der jahrFormat Variable kann man zwischen Schalt- und nicht Schaltjahren unterscheiden. 
+
+Die Schaltjare sind Jahre die 366 Tage statt 365 beinhalten. Die Regeln dafür wurden erst im Jahr 1582 eingeführt. Laut den sind Schaltjahre die, die durch 4 und 100 teilbar sind, mit der Ausnahme von Jahren die auf 00 enden (zB. 2100).
+
+In der Schleife wird es geprüft ob das nächste Jahr Schaltjahr ist. Wenn ja, dann wird die jahrFormat Variable auf 366 gesetzt. Wenn das nächste Jahr 1582 ist wird das Format auf 355 Tage gesetzt, da in dem Jahr der Übergang vom julianischen zum gregorianischen  Kalender stattgefunden ist. Als nächstes wird die OHDM-Datumvariable mit dem Jahrformat vergliechen. Wenn das Jahrformat kleiner ist, heisst es dass das Datum noch weiter liegt. Deswegen wird ein Jahr substrahiert. Dann wird das Datumformat vom OHDM-Datum abgezogen und der Vorgang wird wiederholt. Am Ende wenn das eigentliche Jahr 0 ist wird ein Jahr abgezogen. Das ist wichtig, da das Jahr Null nur aus astronomischer Sicht existiert und im Endefekt das Jahr 1 v. Chr. Ist.
+
+Nachdem jahrBerechnen() Methode abgearbeitet wird, wird es geprüft ob dateInOhdm Variable (das eingegebene Datum im OHDM Format) gleich 0 ist. Wenn das stimmt, wird der Monat auf 1 gesetzt  und wenn nicht wird die monatBerechnen() Methode aufgerufen.
+
+In der Methode monatBerechnen() wird zuerst festgestellt ob das Jahr im gregorianischen Kalender, wo das OHDM Datum liegt, Schaltjahr ist. Das Monatformat wird auf 31 und die monatFinal-Variable auf 12 gesetzt. Die Variable monatFinal dient dazu, den letzten Monat nach dem Ende der for-Schleife abzufangen. In der dateTemp Variable wird der dateInOhdm-Zwischenstand gespeichert. In der for-Schleife wird zunächst int m = 12 definiert, sie stellt die Monatnummer dar. Nach jedem Durchgang wird m um 1 kleiner, bis dateInOhdm kleiner als monatFormat wird.
+In der Schleife wird das Monatformat von der Variable dateInOhdm abgezogen. Danach wird es geprüft welches Monatformat der nächste Monat hat. Wenn das Monatformat des gerade abgearbeiteten Monats gleich 30 oder die Nummer des nächsten Monats gleich 7 (Juli) oder 1 (Januar) ist, wird das Monatformat auf 31 gesetzt, im anderen Fall wird es auf 30 gesetzt. Danach wird der nächste Monat noch mal untersucht. Wenn der Monat Februar und das Jahr Schaltjahr sind, wird dem Monatformat 29 zugewiesen ansonsten 28. Am Ende der Schleife wird die Monatsnummer m in der Variable monatFinal gespeichert. 
+Nach der Schleife wird der Wert der monatFinal-Variable der monat-Variable zugeschrieben. Wenn das restliche Datum dateInOhdm grösser als 0 und dateTemp (der Wert der dateInOhdm-Variable vor den Abzügen) ungleich dateInOhdm bleiben wird die monat-Variable um 1 kleiner. Da die dateInOhdm-Variable noch nicht komplett abgearbeitet ist, bleiben da noch Tage die in dem nächsten Monat liegen. Deswegen muss es von der monat-Variable 1 abgezogen werden. Danach wird der monatFormat-Wert in der Variable monatFormat der Klasse GregorCalender gespeichert.
+
+Nachdem der Monat berechnet ist, wird der Wert der dateInOhdm-Variable in der Methode calculate() mit 0 verglichen. Wenn die Bedingung stimmt wird der Variable tag 1 zugewiesen und wenn nicht wird die Methode tagBerechnen() aufgerufen.
+
+In der Methode tagBerechen() wird die Variable tag gesetzt. Sie ist gleich monatFormat (die Anzahl von Tagen in dem Monat) – dateInOhdm (die restliche Tage die nach jahrBerechnen() und monatBerechnen() in der Variable geblieben sind) + 1 (damit der eigentliche Tag mitgerechnet wird).
+
+Nachdem wird die Methode calculate() zu Ende. Es wird ein String im Format tt.mm.jjjj zurückgegeben.
+
+\subsection{Gregorianischen Kalender \textrightarrow OHDM-Datum}
+Um das Datum ins OHDM-Datumformat aus dem gregorianischen Kalendersystem umzuwandeln muss man im Hauptmenü der Benutzeroberfläche "2" und das gewünschte Datum im tt.mm.jjjj Format eingeben. Es wird ein Objekt der Klasse GregorCalender mit leerem Konstruktor erstellt. Dann wird die Methode fromGregorCalender vom Objekt der Klasse GregorCalender mit dem vorher eingegebenen Datum als Parameter aufgerufen. Der Rückgabewert dieser Methode wird einer neu definierten Variable int ohdmDatum\_Out übergeben.
+
+In der Methode fromGregorCalender wird zuerst das Datum, das im Stringformat übergeben wurde, in 3 int Variablen zerlegt (tagEingabe, monatEingabe und jahrEingabe). Außerdem werden 2 Variablen angelegt (int neuesOHDMdatum für das Datum im OHDM-format zum zurückgeben und int jahrFormat zum Jahresberechnen). Die Methode besteht aus 3 Teilen: Monatsformat-, Monats-, Tages- und Jahresberechnen.
+
+Zuerst wird das Monatsformat festgelegt. Der Anfangswert der Monatsformatvariable beträgt 31. Wenn monatEingabe-Wert gleich 4, 6, 9 oder 11 ist (April, Juni, September, November), dann wird monatFormat-Wert auf 30 festgelegt. Wenn monatEingabe-Wert gleich 2 ist (Februar), wird das Jahr nach dem Schaltjahr untersucht. Wenn das stimmt wird das Monatsformat auf 29 und wenn nicht auf 28 gesetzt.
+
+Dann werden die Monate in der for-Schleife abgearbeitet. Die Schleife wird solange durchgeganen, bis der Wert der monatEingabe-Variable größer als 12 ist. Das Monatsformat wird der  neuesOHDMdatum-Variable addiert. Dann wird das Monatsformat für den nächsten Monat festgelegt. Wenn das Monatformat gleich 30 oder monatEingabe + 1 gleich 3 (März) oder monatEingabe + 1 gleich 8 (August) ist, wird das Monatsformat auf 31 gesetzt. Ansonsten wenn das Monatsformat gleich 31 ist wird das Monatsformat auf 30 gesetzt. Danach wird es geprüft ob der nächste Monat Februar ist (monatEingabe+1), wenn ja wird es auch überprüft ob das Jahr (jahrEingabe) ein Schaltjahr ist. Dann wird Monatsformat dementsprechend geändert. Außerdem wenn das Jahr 1582 ist, wird das Monatsformat vom Februar auf 18 gesetzt, da in diesem Jahr der Übergang vom julianischen auf gregorianischen Kalender stattgefunden ist.
+
+Als nächstes werden die Tage (tagEingabe-1) von der neuesOHDMdatum-Variable abgezogen, weil die Variable sonst den ganzen Monat enthält. Man muss -1 dazuschreiben da der "aktuelle" Tag sonst wegfällt.
+
+Als letztes werden die Jahre in einer for-Schleife abgearbeitet. Am Anfang der Schleife wird das Jahresformat (die Anzahl von Tagen in einem Jahr) auf 365 gesetzt und die jahrEingabe-Variable um 1 erhöht (da das Jahr aus der jahrEingabe schon durchgegangen wurde). Nach jedem Durchgang der Schleife wird der Wert der jahrEingang-Variable um 1 erhöht und das Jahresformat wieder auf 365 gesetzt. Die Schleife wird dann beendet wenn der Wert von jahrEingabe größer oder gleich 2118 ist. Zuerst wird es mithilfe von schaltjahr(int jr)-Methode überprüft, ob das Jahr ein Schaltjahr ist. Wenn die Bediengung stimmt wird das Jahrformat auf 366 gesetzt. Dann wird das Jahr mit 1582 verglichen, da es aufgrund der Kalenderreform im Jahr 1583 nur 355 Tage gab. Als nächstes wird das Jahr mit 0 verglichen. Wenn es der Fall ist, wird das Jahresformat auf 0 gesetzt, da das Jahr Null  nicht existiert. Am Ende der Schleife wird das Jahresformat der neuesOHDMdatum-Variable addiert. Als letztes in der Methode wird "neuesOHDMdatum-21" zurückgeben. Die Zahl 21 braucht man um die Differenz mit dem Datum 11.12.2117 auszugleichen. Der Dezember hat 31 Tage, -20 bekommt man 11 und extra -1 ermöglicht den Tag 11 auszuschließen.
+
+Nach dem das Ergebnis an OhdmDateMain zurückgegeben ist, wird das an der Konsole ausgegeben.
+
+
+\subsection{OHDM-Datum \textrightarrow Maya-Kalendersystem}
+Die Mayas hatten 3 Kalender, die sie während ihrer Zeit genutzt haben: Haab (zivile Zwecke,  sowie Berechnung der Saat- und Erntezeiten), Tzolkin (rituelle Zwecke) und Lange Zählung. Unser Programm ermöglicht die Umrechnung aus dem OHDM-Datumsformat in den Maya-Kalender der Langen Zählung.
+
+Die Mayas haben einen Tag festgelegt (11. oder 13. August 3114 v.Chr) (in unserem Programm 13.08.-3114) an dem laut ihrer Sicht die Welt erschafft wurde. Ab dem Tag werden die Tage weiter gezählt. Das Datum ist fünfstellig, wobei die einzelnen Stellen folgende Bereiche [0..19] ("Baktun"), [0..19] ("Katun"), [0..19] ("Tun"), [0..17] ("Uinai"), [0..19] ("Kin") haben. Jede Stelle hat einen bestimmten Zahlenwert: Baktun * 144000, Katun * 7200, Tun * 360, Uinai * 20, Kin * 1.  Die Mayas haben den ersten Tag am 13.0.0.0.0 festgelegt, ab dem sie weiter gezählt haben. 
+
+Um das Datum ins Maya-Kalendersystem aus dem OHDM-Datum umzuwandeln muss man im Hauptmenü der Benutzeroberfläche "3" und das gewünschte Datum im OHDM Format eingeben. Dann wird ein Objekt der Klasse MayaCalender in der Klasse OhdmDateMain mit leerem Konstruktor erstellt. Dabei wird in dem Konstruktor der MayaCalender-Klasse ein Objekt mayaFirstDay der GregorCalender-Klasse angelegt. Das Objekt dient dazu, das Datum der Erschaffung der Welt in OHDM-Format zu berechnen und anschließend in dem Objekt der Klasse MayaCalender intern in der mayaFirstDay-Variable zu speichern. Nachdem der Konstruktor der MayaCalender-Klasse abgearbeitet ist, wird die Methode inMayaCalender(int datumOHDM) aufgerufen. Der Methode wird das eingegebene Datum im OHDM-Format zum Verarbeiten übergeben.
+
+Das vorher im Konstruktor ausgerechnete Datum der Erschaffung der Welt wird hier benötigt. Als erstes wird dem übergebenen Datum datumOHDM die Defizienz zwischen mayaFirstDay und datumOHDM zugewiesen. So bekommt man in der datumOHDM-Variable den Zeitabschnitt zwischen dem gewünschten eingegebenen Datum und dem Datum der Erschaffung der Welt.
+
+Als erstes wird die Baktun-Periode durch datumOHDM / 144000 (Division ohne Rest) berechnet. So bekommt man eine ganze Zahl die Baktun-Perioden repräsentiert. Dann wird die Multiplikation von baktun-Variable mit 144000 von datumOHDM abgezogen. In der for-Schleife wird die baktun-Variable geprüft ob die den Wert von 19 (der Stellenwert) überschritten hat. Wenn es der Fall ist wird 19 davon abgezogen, so wiederholt sich der Vorgang bis baktun kleiner oder gleich 19 ist.
+
+Dann passiert genau das gleiche mit katun (datumOHDM / 7200, Stellenwert 19), tun (datumOHDM / 360, Stellenwert 19), uinai (datumOHDM / 20, Stellenwert 17) und kin erhält nur den Rest von datumOHDM was noch bleibt. Die kin-Periode wird schließlich auch geprüft nach dem Überlauf von Stellenwert 19.
+
+Zurückgegeben wird ein String mit jeweiligen Perioden getrennt mit Punkten dazwischen.
+\end{document}
+
