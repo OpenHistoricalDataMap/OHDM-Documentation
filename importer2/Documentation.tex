@@ -1,0 +1,133 @@
+\documentclass[]{article}
+\usepackage{textcomp}
+\thispagestyle{empty}
+
+\begin{document}
+\begin{center}
+\Large{Hochschule für Technik und Wirtschaft Berlin}\\
+\Large{- Campus Wilhelminenhof -}\\
+\Large{Belegarbeit}\\
+\Large{Ortsbasierte Informationssysteme}\\
+\begin{verbatim}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\end{verbatim}
+\begin{tabular}{llll}
+\textbf{Thema: } & & Importer von GeoJSON-, GML- \\
+&& und KML-Formaten \\
+&& &\\
+\textbf{Autor:} & & David Linke, Sophie Schauer \\
+&& &\\
+\textbf{Betreuer:} & & Prof. Dr. Thomas Schwotzer &\\
+\end{tabular}
+\end{center}
+\pagebreak
+\section{Aufgabe der Komponenten}
+In der Open Historical Data Map werden Karten, anders als bei OpenStreetMap oder GoogleMaps, aus verschiedenen Zeiträumen zur Verfügung gestellt. Um die Datenbank mit einer Vielzahl von historischen Karten füllen zu können, und dies auch für Außenstehende möglich zu machen, ist eine Schnittstelle zum schnellen und einfachen Importieren notwendig. In dieser sollen Kartendaten in den gängigen Formaten, wie GeoJSON, KML, GML, eingefügt, benannt und zeitlich eingeordnet werden können. Die Daten sollen dann direkt in die Datenbank gespeichert werden und so zur Bearbeitung nutzbar sein.\\
+\\
+
+Da PostGIS Geometrien nicht in den Formaten KML, GML oder GeoJSON erfasst, müssen die Dateien zunächst umgewandelt werden. Nach Evaluierung des bestehenden Codes einer Vorgängerversion des Importers und der PostGIS-Dokumentation konnten wir feststellen, dass PostGIS über Funktionen zur einfachen Umwandlung von KML-, GML- und GeoJSON-Formaten in PostGIS-Geometrie-Objekte verfügt. Als Schnittstelle zwischen Benutzer und Datenbank wurde eine Webseite erstellt. Der Benutzer kann auf der Webseite das Format der Datei auswählen, einen Namen hinterlegen, die Klassifikation bestimmen und angeben in welchem Datumsbereich die von ihm zu importierende Datei gültig ist. In einem Textfeld können die eigentlichen Geometriedaten erfasst werden.\\
+\\
+\\
+Um die Geometriedaten in die OHDM-Datenbank zu importieren wird eine Klasse benötigt, die eine Verbindung zur Datenbank und dem richtigen Schema erstellt. Das Servlet nimmt die eingegebenen Daten entgegen und verbindet sich mit der Datenbank. Die Geometriedaten werden, je nach ausgewählten Format, zur Umwandlung weitergeleitet. Daraufhin muss eine SQL-Query erstellt werden, um die Daten letztlich in die richtige Tabelle der Datenbank einzufügen.
+
+\section{Formate}
+\subsection{GML - Geography Markup Language}
+GML ist eine auf XML basierende Auszeichnungssprache, welche die Übermittlung von Geometriedaten auch unter Einbeziehung von Sensordaten oder ähnlichen Attributen ermöglicht. Es enthält Primitiven unter Anderem wie Objekt, Geometrie, Koordinatenreferenzsystem und Zeit. Die wichtigsten Objekttypen in GML sind Point, LineString und Polygon, und weist damit ein identisches Modell wie KML auf. GML wird hauptsächlich genutzt um ein Spektrum von \\Anwendungsobjekten und deren Eigenschaften zu beschreiben. [1] [3]
+
+\subsection{KML - Keyhole Markup Language}
+KML befolgt, wie GML, die XML-Syntax und wird vorrangig zur Visualisierung geographischer Informationen verwendet. KML-Daten können genutzt werden, um GML-Inhalte darzustellen. Die Geometriedaten können sowoh in Vektor- als auch Rasterform angegeben sein, also bestehend aus grafischen Primitiven wie Linien, Kreisen, Polygonen, oder aus einer rasterförmigen Anordnung von Bildpunkten. [3] [4] [5]
+
+\subsection{GeoJSON}
+GeoJSON wird verwendet, um geografische Daten nach der Simple-Feature-Access-Spezifikation zu repräsentieren und wird in der JavaScript Object Notation angegeben. Zu den unterstützten Geometrien zählen auch hier Punkte, Linien und Polygone. Darüber hinaus können auch mehrteilige Typen der genannten Geometrien angezeigt werden. [2]
+
+\section{Architektur}
+\subsection{Modellübersicht}
+Das Projekt besteht aus folgenden Klassen:
+\begin{itemize}
+	\item \textit{GisConn.java}- Erstellung der Verbindung zur OHDM-Datenbank
+	\item \textit{ImportServlet.java}- Entgegennahme der Geometeriedaten des Benutzers über die Webseite
+	\item \textit{DatabaseController}- Trägt Geometriedaten in die Tabellen geoobject und geoobject\_geometry der Datenbank ein
+	\item \textit{GeoJSONController.java}- Zur Umwandlung von GeoJSON-Daten in Post\\GIS-fähige Geometrien und trägt sich in die Point-, LineString- oder Polygon-Tabelle ein
+	\item \textit{GMLController.java}- Zur Umwandlung von GML-Daten in PostGIS-fähige Geometrien und trägt sich in die Point-, LineString- oder Polygon-Tabelle ein
+	\item \textit{KMLController.java}- Zur Umwandlung von KML-Daten in PostGIS-fähige Geometrien und trägt sich in die Point-, LineString- oder Polygon-Tabelle ein
+	\item \textit{Index.html, Styles.css}- Benutzeroberfläche zur Eingabe der Geometriedaten
+\end{itemize}
+
+\subsection{Schnittstellendefinitionen}
+\subsubsection{GisConn.java}
+Diese Klasse wird genutzt um eine Verbindung zur OHDM-Datenbank zu schaffen. Der Hostname, die Datenbank, das Schema, der User und das Passwort müssen zunächst gesetzt werden. Es gibt eine Funktion setConn() um die Verbindung zu initialisieren, und eine Funktion closeConn() um die Verbindung wieder zu schließen. 
+
+\subsubsection{ImportServlet.java}
+Durch Drücken des Submit-Buttons auf der HTML-Seite werden die eingegebenen Daten an das Servlet weitergeleitet. Das Servlet zieht aus diesem Request den Namen, die Klassifikation, den Gültigkeitszeitraum, das Format und die eigentlichen Geometriedaten heraus. Anschließend wird mittels einer Switch-Case-Anweisung unterschieden welches Format ausgewählt wurde, auf dieser Basis werden nun weitere Methoden aufgerufen. Zur Speicherung in der Datenbank müssen einige Parameter gesetzt werden, dazu gehört die UserID, das IDTarget, das TypeTarget, die IDGeoObjectSource und die ClassificationID. Die UserID wurde zu Beginn vom Benutzer gesetzt. Die KlassifikationsID wird der Anfrage entnommen. Wurden die Geometriedaten am Ende erfolgreich eingefügt, erhält das Servlet die ID der neu eingetragenen Geometrie.
+
+\subsection{DatabaseController.java}
+Diese Klasse enthält die Methoden zur Erstellung des Namens der neuen Geo-Daten und ist verantwortlich für einige Tabelleneinträge in der Datenbank. Die Methode addGeoObject() trägt den Name in der passenden Tabelle für die neue Geometrie ein und addGeoObjectGeometry() sorgt dafür das ein Eintrag in der Tabelle geoObjectGeometrie gemacht wird.
+
+\subsubsection{KMLController.java}
+In der KMLController-Klasse wird die PostGIS-Funktion ST\_GeomFromKML() wird genutzt um die Daten umzuwandeln. Die Daten werden zunächst in der Funktion addKMLObject() auf die Tags "Polygon", "Point" und "Linestring" überprüft und dann an die Funktion addGeometry() weitergeleitet. Anschließend werden die Daten in die passenden Tabellen der Datenbank eingetragen.
+
+\subsubsection{GMLController.java}
+Der Ablauf innerhalb der GML-Controller-Klasse ist gleich zu der des eben beschriebenen KML-Controller. Der Aufbau von GML-Daten ist ähnlich zu der von KML-Daten. Die PostGIS-Funktion ST\_GeomFromGML() wird genutzt um die Daten umzuwandeln. Die Daten werden zunächst in der Funktion addGMLObject() auf die Tags "Polygon", "Point" und "Linestring" überprüft und dann an die Funktion addGeometry() weitergeleit, wo sie dann der Datenbank hinzugefügt werden.
+
+\subsubsection{GeoJSONController.java}
+Auch in dieser Klasse wird das gleiche Ablaufschema verwendet, wie in den vorgehenden.
+
+\section{Probleme}
+Zur Umwandlung der Geometriedaten aus den einzelnen Formaten wird ein PostGis-JDBC-Treiber genutzt. Ein häufig aufgetretener Fehler war eine Exception, die geworfen wurde, da die Funktionen ST\_GeomFromGeoJSON, \\ST\_GeomFromGML und ST\_GeomFromKML nicht existieren. Die ist auf eine fehlerhafte Version des JDBC-Treibers zurück zu führen. Bei Auftreten dieses Fehlers muss sichergestellt werden, dass die Version 1.3.3 genutzt wird.\\
+\\
+
+Desweiteren wird ein PostGreSQL-JDBC-Treiber genutzt. Damit zusammenhängend trat vermehrt ein NoSuchMethodError unter dem Pfad target/Imprts-1.0-SNAPSHOT/WEB-INF/lib/ auf. Es existieren zwei Dinge postgresql(Version) und postgresql(Version).jdbc. Dieses Problem konnte, durch Löschung von postgresql(Version) und des entsprechenden Eintrags in der pom.xml-Datei, behoben werden.\\
+\\
+
+Bei der Nutzung der Funktionen ST\_GeomFromGeoJSON, ST\_GeomFromGML und ST\_GeomFromKML sind nur eine Tags wie "Point", "Coordinates" erlaubt, andere Tags können nicht genutzt werden, da sonst eine Exception geworfen wird. Es wird eine vereinfachte Form benötigt. Dieses Problem konnte mit Hilfe von Regulären Ausdrücken behoben werden.
+
+\section{Nutzung}
+\subsection{Code}
+Der Code unseres Projekts lässt sich unter dem Master-Branch des folgenden Repositories finden: \\https://github.com/OpenHistoricalDataMap/Importer. \\
+\\
+Zur Programmierung wurde Java genutzt, und die Webseite wurde mit HTML erstellt.
+
+\subsection{Deployment / Runtime}
+Eine Verbindung zum Geoserver kann nur erstellt werden, wenn sich der PC des Benutzers im Netzwerk der HTW befindet. Sollte das Servlet in einem anderen Netzwerk installiert werden, muss zunächst eine VPN-Verbindung zu SSL-VPN-HTW erzeugt werden. 
+Es muss die persönliche Nutzer-ID in der ImportServlet-Klasse unter der Variable userID eingetragen werden.
+Mit Hilfe von Maven muss eine .war-Datei im Target-Ordner des Projekts erstellt werden. Sofern Tomcat genutzt wird, muss nun diese .war-Datei in den webapp-Ordner des Tomcat-Verzeichnisses geschoben werden. Um den Importer zugänglicher für Nutzer zu machen, muss noch ein Button auf der OHDM.net-Seite erstellt werden. Der Server wird dann gestartet, dieser startet automatisch das Servlet. Der Importer ist damit bereit zur Nutzung.
+
+\section{Qualitätssicherung}
+Die Qualität der Komponenten wird nicht gesichert. Auf das Erstellen von Tests musste verzichtet werden.
+
+
+\section{Vorschläge / Ausblick}
+Der von uns entwickelte Importer kann nun noch um einen Exporter erweitert werden. Dateien könnten aus einem bestimmten Kartenabschnitt extrahiert und in der Formaten KML, GML und GeoJSON ausgegeben werden. PostGIS stellt hierfür ähnliche Funktionen zur Verfügung wie die von uns genutzten. Auf der jetzigen Import-Webseite könnte dann in diesem Fall angegeben werden in welchem Format und in welchem Datumsbereich die Daten exportiert werden sollen.
+
+\newpage
+\section{Literaturverzeichnis}
+
+1. Geography Markup Language. https://de.wikipedia.org/wiki/Geography\_Markup\_Language (27.09.2018)\\
+\\
+
+2. GeoJSON. https://de.wikipedia.org/wiki/GeoJSON (27.09.2018)\\
+\\
+
+3. Keyhole Markup Language. https://de.wikipedia.org/wiki/Keyhole\_Markup\_Language(27.09.2018)\\
+\\
+
+4. Rastergraik. https://de.wikipedia.org/wiki/Rastergrafik (27.09.2018)\\
+\\
+
+5. Vektorgrafik. https://de.wikipedia.org/wiki/Vektorgrafik (27.09.2018)
+
+\end{document}
